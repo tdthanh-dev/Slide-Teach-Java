@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java 101 — Buổi 1 (3 giờ)</title>
+<meta name="description" content="Slide trình chiếu buổi học Java đầu tiên — 3 giờ, HTML/CSS/JS thuần." />
+<style>
+  :root {
+    --bg: #0e1117;
+    --panel: #0b1220;
+    --ink: #e6edf3;
+    --muted: #a1a1aa;
+    --line: #23324a;
+    --code-bg: #111827;
+    --code-line: #1f2937;
+    --accent: #00bcd4;
+    --accent-2: #7c3aed;
+    --danger: #ef4444;
+    --success: #22c55e;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, Apple Color Emoji, Segoe UI Emoji;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Slides */
+  .slides {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    isolation: isolate;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(124, 58, 237, 0.07), transparent 60%),
+      radial-gradient(1000px 500px at 0% 100%, rgba(0, 188, 212, 0.09), transparent 60%);
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 64px 72px;
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: 24px;
+    opacity: 0;
+    transform: translateX(40px) scale(.985);
+    transition: opacity .4s ease, transform .5s ease;
+    pointer-events: none;
+  }
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+  }
+
+  /* Typography */
+  h1, h2, h3 { margin: 0; line-height: 1.1; }
+  h1 { font-size: 54px; letter-spacing: .2px; }
+  h2 { font-size: 38px; color: var(--accent); }
+  h3 { font-size: 26px; color: #cbd5e1; }
+  p { font-size: 22px; line-height: 1.6; margin: 0; }
+  ul, ol { font-size: 22px; line-height: 1.6; margin: 0; padding-left: 22px; }
+  li { margin: 6px 0; }
+  .muted { color: var(--muted); }
+  .small { font-size: 18px; color: var(--muted); }
+  .badge {
+    display: inline-block;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: #cbd5e1;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 14px;
+    margin-left: 8px;
+  }
+  .quote {
+    font-size: 24px;
+    color: #cbd5e1;
+    border-left: 3px solid var(--accent);
+    padding-left: 12px;
+  }
+  mark {
+    background: rgba(0, 188, 212, 0.15);
+    color: #a7f3d0;
+    padding: 0 6px;
+    border-radius: 6px;
+  }
+  kbd {
+    background: #1f2937;
+    color: #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid #374151;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #334155, transparent);
+    margin: 4px 0 0 0;
+    width: 100%;
+  }
+
+  /* Layout helpers */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .callout {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+
+  /* Illustration blocks */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    width: 100%;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 20px 40px rgba(2, 6, 23, 0.15);
+    transition: transform .15s ease, border-color .2s ease, background .2s ease;
+  }
+  .card:hover { transform: translateY(-3px); border-color: #334155; background: #0f172a; }
+  .card .icon { font-size: 26px; line-height: 1; }
+  .card h3 { margin: 8px 0 6px 0; font-size: 20px; color: #e2e8f0; }
+  .card p { margin: 0; font-size: 18px; color: var(--muted); }
+
+  .pill-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .pill {
+    background: #0b1220;
+    border: 1px solid #1f2937;
+    color: #cbd5e1;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .steps { display: grid; gap: 12px; margin-top: 12px; width: 100%; }
+  .step { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: start; }
+  .step > * { min-width: 0; grid-column: 2; }
+  .step { word-break: normal; overflow-wrap: break-word; }
+  .step::before {
+    content: counter(step);
+    counter-increment: step;
+    width: 28px; height: 28px;
+    display: grid; place-items: center;
+    background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    color: #fff; border-radius: 999px; font-weight: 700;
+  }
+  .steps { counter-reset: step; }
+
+  /* Compact helpers (for dense slides) */
+  .slide.compact { padding: 48px 56px; gap: 18px; }
+  .cards.three { grid-template-columns: repeat(3, minmax(180px, 1fr)); }
+  .card.sm { padding: 10px 12px; border-radius: 12px; }
+  .card.sm h3 { font-size: 18px; }
+  .card.sm p { font-size: 15px; }
+  .flow { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .flow .pill { font-size: 13px; padding: 4px 8px; }
+  .arrow { color: var(--muted); }
+
+  /* Compact two-col tweaks for dense slides */
+  .two-col.slim { grid-template-columns: 1fr 1fr; gap: 20px; }
+  .tight { font-size: 20px; line-height: 1.45; }
+  .tight li { margin: 4px 0; }
+
+  /* Mini checklist cards */
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 12px; }
+  .mini { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; }
+  .mini p { margin: 2px 0 0; font-size: 16px; color: #cbd5e1; }
+  .num { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 999px; color: #fff; font-weight: 700; background: linear-gradient(180deg, var(--accent), var(--accent-2)); }
+
+  /* Code */
+  pre, code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+  pre {
+    background: var(--code-bg);
+    color: #e5e7eb;
+    border: 1px solid var(--code-line);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 18px;
+    overflow: auto;
+    max-height: 60vh;
+    width: 100%;
+  }
+  code.inline {
+    background: #0b1220;
+    border: 1px solid #23324a;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 90%;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 20px;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: 10px 12px;
+    vertical-align: top;
+  }
+  th {
+    background: var(--panel);
+    color: #cbd5e1;
+    text-align: left;
+  }
+
+  /* Footer/nav */
+  .footer {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    background: rgba(2, 6, 23, 0.55);
+    backdrop-filter: blur(6px);
+    border-top: 1px solid #111827;
+    z-index: 10;
+  }
+  .controls { display: flex; gap: 8px; }
+  .button {
+    background: var(--panel);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background .2s, transform .05s, opacity .2s;
+  }
+  .button:hover { background: #0f1a2b; }
+  .button:active { transform: translateY(1px); }
+  .button[disabled] { opacity: .5; cursor: not-allowed; }
+
+  .progress {
+    height: 6px;
+    background: var(--panel);
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    overflow: hidden;
+    width: 32%;
+  }
+  .progress > span {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transition: width .3s ease;
+  }
+  .help { font-size: 14px; color: var(--muted); }
+
+  /* Print (optional) */
+  @media print {
+    body, .slides, .slide { position: static; height: auto; }
+    .slide { page-break-after: always; opacity: 1 !important; transform: none !important; }
+    .footer { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="slides" id="deck">
+    <!-- 1. Title -->
+    <section class="slide active">
+      <h1>Java 101 — Buổi 1</h1>
+      <h2>Nền tảng, môi trường, Hello World, cú pháp cơ bản</h2>
+      <p class="muted">Thời lượng: ~3 giờ <span class="badge">Desktop</span> <span class="badge">HTML/CSS/JS thuần</span></p>
+      <hr />
+      <div class="quote">“Write once, run anywhere” — Tư tưởng cốt lõi của Java.</div>
+    </section>
+
+    <!-- 2. Agenda -->
+    <section class="slide">
+      <h2>Nội dung buổi học</h2>
+      <ul>
+        <li>Giới thiệu Java: Java là gì, ứng dụng, đặc điểm</li>
+        <li>Cài đặt môi trường: JDK, IDE</li>
+        <li>Viết chương trình <em>Hello World</em></li>
+        <li>Cấu trúc cơ bản của một chương trình Java</li>
+        <li>Biến, kiểu dữ liệu và toán tử</li>
+        <li>Câu lệnh điều kiện <code class="inline">if / else</code></li>
+        <li>Tổng kết và bài tập về nhà</li>
+      </ul>
+    </section>
+
+    <!-- 3. Java là gì -->
+    <section class="slide">
+      <h2>Java là gì?</h2>
+      <ul>
+        <li>Ngôn ngữ lập trình bậc cao, hướng đối tượng (OOP), do Sun Microsystems (nay là Oracle) phát triển.</li>
+        <li>Chạy trên <strong>JVM</strong> (Java Virtual Machine) với bytecode → đa nền tảng.</li>
+        <li>Hệ sinh thái phong phú: thư viện chuẩn, build tools, framework.</li>
+      </ul>
+      <div class="callout small">
+        <strong>Mấu chốt:</strong> biên dịch sang <em>bytecode</em>, chạy trên JVM nên ít phụ thuộc HĐH.
+      </div>
+      <div class="pill-list" aria-label="Từ khoá chính">
+        <span class="pill">OOP</span>
+        <span class="pill">Bytecode</span>
+        <span class="pill">JVM</span>
+        <span class="pill">Đa nền tảng</span>
+        <span class="pill">Bảo mật</span>
+      </div>
+    </section>
+
+    <!-- 4. Ứng dụng -->
+    <section class="slide">
+      <h2>Java được dùng ở đâu?</h2>
+      <ul>
+        <li>Hệ thống doanh nghiệp: dịch vụ web, microservices, ERP</li>
+        <li>Android (nền tảng cũ, hiện nhiều Kotlin nhưng Java vẫn phổ biến)</li>
+        <li>Backend: Spring, Quarkus, Micronaut</li>
+        <li>Big Data, tài chính, ngân hàng, IoT</li>
+      </ul>
+      <div class="cards" role="list" aria-label="Minh hoạ lĩnh vực ứng dụng">
+        <div class="card" role="listitem">
+          <div class="icon">🏢</div>
+          <h3>Doanh nghiệp</h3>
+          <p>Microservices, ERP, hệ thống lõi bền bỉ.</p>
+        </div>
+        <div class="card" role="listitem">
+          <div class="icon">📱</div>
+          <h3>Android</h3>
+          <p>Ứng dụng di động; Java vẫn phổ biến bên cạnh Kotlin.</p>
+        </div>
+        <div class="card" role="listitem">
+          <div class="icon">☁️</div>
+          <h3>Backend</h3>
+          <p>Spring Boot, Quarkus, Micronaut cho API hiệu năng.</p>
+        </div>
+        <div class="card" role="listitem">
+          <div class="icon">📊</div>
+          <h3>Big Data/Fintech</h3>
+          <p>Hadoop, Spark, xử lý dữ liệu lớn, giao dịch an toàn.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Đặc điểm -->
+    <section class="slide">
+      <h2>Đặc điểm nổi bật</h2>
+      <ul>
+        <li><strong>Đa nền tảng</strong>: WORA (Write Once, Run Anywhere)</li>
+        <li><strong>OOP</strong>: đóng gói, kế thừa, đa hình</li>
+        <li><strong>Bộ nhớ an toàn</strong>: garbage collector</li>
+        <li><strong>Bảo mật, ổn định</strong>: kiểm tra kiểu mạnh</li>
+        <li><strong>Hiệu năng tốt</strong>: JIT compilation</li>
+      </ul>
+      <div class="cards" aria-label="Minh hoạ đặc điểm">
+        <div class="card">
+          <div class="icon">🧭</div>
+          <h3>WORA</h3>
+          <p>Chạy trên nhiều HĐH với JVM tương ứng.</p>
+        </div>
+        <div class="card">
+          <div class="icon">🧩</div>
+          <h3>OOP</h3>
+          <p>Thiết kế phần mềm rõ ràng, dễ mở rộng.</p>
+        </div>
+        <div class="card">
+          <div class="icon">🧹</div>
+          <h3>GC</h3>
+          <p>Tự quản lý bộ nhớ, giảm lỗi tràn/đụng bộ nhớ.</p>
+        </div>
+        <div class="card">
+          <div class="icon">⚡</div>
+          <h3>Hiệu năng</h3>
+          <p>JIT tối ưu trong khi chạy, tốc độ tốt.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. JVM/JRE/JDK -->
+    <section class="slide compact">
+      <h2>JVM, JRE, JDK khác nhau thế nào?</h2>
+      <div class="flow" aria-label="Mối quan hệ">
+        <span class="pill">JVM</span>
+        <span class="arrow">→</span>
+        <span class="pill">JRE = JVM + Runtime</span>
+        <span class="arrow">→</span>
+        <span class="pill">JDK = JRE + Tools</span>
+      </div>
+      <div class="cards three" role="list" aria-label="Tóm tắt">
+        <div class="card sm" role="listitem">
+          <div class="icon">🖥️</div>
+          <h3>JVM</h3>
+          <p>Máy ảo thực thi <em>bytecode</em>, có GC/JIT.</p>
+        </div>
+        <div class="card sm" role="listitem">
+          <div class="icon">📦</div>
+          <h3>JRE</h3>
+          <p>JVM + thư viện runtime để chạy ứng dụng.</p>
+        </div>
+        <div class="card sm" role="listitem">
+          <div class="icon">🛠️</div>
+          <h3>JDK</h3>
+          <p>JRE + công cụ phát triển (javac, javadoc...).</p>
+        </div>
+      </div>
+      <div class="flow" aria-label="Luồng cơ bản">
+        <span class="pill">.java</span>
+        <span class="arrow">→</span>
+        <span class="pill">javac</span>
+        <span class="arrow">→</span>
+        <span class="pill">.class (bytecode)</span>
+        <span class="arrow">→</span>
+        <span class="pill">JVM</span>
+      </div>
+      <p class="small">Lập trình viên cần <strong>JDK</strong> để biên dịch và chạy dự án.</p>
+    </section>
+
+    <!-- 7. Cài đặt JDK -->
+    <section class="slide compact">
+      <h2>Cài đặt JDK (Windows)</h2>
+      <div class="two-col slim">
+        <div>
+          <ol class="tight">
+            <li>Tải JDK LTS: 17 hoặc 21 (Oracle/OpenJDK/Temurin).</li>
+            <li>Cài đặt và chọn “Set JAVA_HOME” nếu có.</li>
+            <li>Thiết lập biến môi trường khi cần: <code class="inline">JAVA_HOME</code>, thêm <code class="inline">%JAVA_HOME%\bin</code> vào <code class="inline">PATH</code>.</li>
+            <li>Kiểm tra phiên bản:</li>
+          </ol>
+          <pre><code>java -version
+javac -version</code></pre>
+          <p class="small">Nếu xuất hiện phiên bản, môi trường đã sẵn sàng.</p>
+        </div>
+        <div>
+          <div class="row" aria-label="Checklist nhanh">
+            <div class="mini"><span class="num">1</span><p><strong>Tải & cài</strong> bản 17/21 từ nhà phát hành tin cậy.</p></div>
+            <div class="mini"><span class="num">2</span><p><strong>JAVA_HOME</strong> trỏ tới thư mục cài đặt JDK.</p></div>
+            <div class="mini"><span class="num">3</span><p>Thêm thư mục <code class="inline">bin</code> của JDK vào <code class="inline">PATH</code>.</p></div>
+            <div class="mini"><span class="num">4</span><p>Chạy <code class="inline">java -version</code>, <code class="inline">javac -version</code> để xác nhận.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. IDE -->
+    <section class="slide">
+      <h2>Chọn IDE</h2>
+      <ul>
+        <li><strong>IntelliJ IDEA Community</strong> (khuyến nghị cho Java)</li>
+        <li><strong>VS Code</strong> + Extension Pack for Java</li>
+        <li><strong>Eclipse IDE</strong></li>
+      </ul>
+      <p class="small">Tạo dự án “Java Project”/“Maven”/“Gradle” tuỳ nhu cầu. Hôm nay dùng dự án đơn giản.</p>
+    </section>
+
+    <!-- 9. Tạo project đầu tiên -->
+    <section class="slide">
+      <h2>Tạo Project đầu tiên</h2>
+      <ul>
+        <li>Tạo file <code class="inline">Main.java</code></li>
+        <li>Cấu trúc thư mục tối thiểu:</li>
+      </ul>
+      <pre><code>project/
+└── src/
+    └── Main.java</code></pre>
+      <p class="small">Tên file nên trùng với tên lớp public chứa <code class="inline">main</code>.</p>
+    </section>
+
+    <!-- 10. Hello World -->
+    <section class="slide">
+      <h2>Hello World</h2>
+      <pre><code>public class Main {
+    public static void main(String[] args) {
+        System.out.println("Xin chào, Java!");
+    }
+}</code></pre>
+      <p class="small">Chạy trong IDE (Run) hoặc dùng dòng lệnh.</p>
+    </section>
+
+    <!-- 11. Biên dịch & chạy -->
+    <section class="slide">
+      <h2>Biên dịch & chạy bằng dòng lệnh</h2>
+      <pre><code>// Từ thư mục chứa src/Main.java
+cd src
+javac Main.java     // biên dịch → sinh Main.class
+java Main           // chạy chương trình</code></pre>
+      <p class="small">Không cần đuôi <code class="inline">.class</code> khi chạy bằng <code class="inline">java</code>.</p>
+    </section>
+
+    <!-- 12. Cấu trúc chương trình -->
+    <section class="slide">
+      <h2>Cấu trúc cơ bản</h2>
+      <ul>
+        <li><strong>Lớp (class):</strong> đơn vị tổ chức chính</li>
+        <li><strong>Hàm <code class="inline">main</code>:</strong> điểm vào chương trình</li>
+        <li><strong>Khối lệnh:</strong> dùng dấu ngoặc nhọn <code class="inline">{ }</code></li>
+        <li><strong>Dấu chấm phẩy:</strong> kết thúc câu lệnh</li>
+        <li><strong>Ghi chú:</strong> <code class="inline">// dòng</code>, <code class="inline">/* ... */</code></li>
+      </ul>
+      <pre><code>public class TenLop {
+    public static void main(String[] args) {
+        // code ở đây
+    }
+}</code></pre>
+    </section>
+
+    <!-- 13. Chi tiết hàm main -->
+    <section class="slide">
+      <h2>Giải thích hàm main</h2>
+      <ul>
+        <li><code class="inline">public</code>: truy cập từ ngoài lớp</li>
+        <li><code class="inline">static</code>: gọi mà không cần tạo đối tượng</li>
+        <li><code class="inline">void</code>: không trả về giá trị</li>
+        <li><code class="inline">String[] args</code>: tham số dòng lệnh</li>
+      </ul>
+    </section>
+
+    <!-- 14. Quy tắc đặt tên & package -->
+    <section class="slide">
+      <h2>Quy tắc đặt tên & package</h2>
+      <ul>
+        <li>Tên lớp PascalCase: <code class="inline">CustomerService</code></li>
+        <li>Tên biến/method camelCase: <code class="inline">totalAmount</code>, <code class="inline">calculateTax()</code></li>
+        <li>Package chữ thường: <code class="inline">com.company.app</code></li>
+        <li>Tên file trùng tên lớp public</li>
+      </ul>
+    </section>
+
+    <!-- 15. Biến & kiểu dữ liệu -->
+    <section class="slide">
+      <h2>Biến & kiểu dữ liệu</h2>
+      <div class="two-col">
+        <div>
+          <ul>
+            <li><strong>Nguyên thuỷ</strong>: <code class="inline">byte</code>, <code class="inline">short</code>, <code class="inline">int</code>, <code class="inline">long</code>, <code class="inline">float</code>, <code class="inline">double</code>, <code class="inline">char</code>, <code class="inline">boolean</code></li>
+            <li><strong>Tham chiếu</strong>: <code class="inline">String</code>, mảng, lớp, interface...</li>
+          </ul>
+        </div>
+        <div>
+          <pre><code>int age = 20;
+double price = 19.99;
+char grade = 'A';
+boolean isActive = true;
+String name = "Lan";</code></pre>
+          <p class="small">Từ Java 10, có thể dùng <code class="inline">var</code> (suy luận kiểu) trong phạm vi local.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16. Bảng kiểu dữ liệu -->
+    <section class="slide">
+      <h2>Kích thước & phạm vi (tham khảo)</h2>
+      <table>
+        <thead><tr><th>Kiểu</th><th>Kích thước</th><th>Phạm vi điển hình</th></tr></thead>
+        <tbody>
+          <tr><td>byte</td><td>8-bit</td><td>-128 đến 127</td></tr>
+          <tr><td>short</td><td>16-bit</td><td>-32,768 đến 32,767</td></tr>
+          <tr><td>int</td><td>32-bit</td><td>~ -2.1 tỉ đến 2.1 tỉ</td></tr>
+          <tr><td>long</td><td>64-bit</td><td>rất lớn (thêm hậu tố <code class="inline">L</code>)</td></tr>
+          <tr><td>float</td><td>32-bit</td><td>số thực (hậu tố <code class="inline">f</code>)</td></tr>
+          <tr><td>double</td><td>64-bit</td><td>số thực (mặc định)</td></tr>
+          <tr><td>char</td><td>16-bit</td><td>ký tự Unicode</td></tr>
+          <tr><td>boolean</td><td>1-bit (khái niệm)</td><td><code class="inline">true</code> / <code class="inline">false</code></td></tr>
+        </tbody>
+      </table>
+      <p class="small">Ví dụ: <code class="inline">long x = 10L;</code>, <code class="inline">float y = 3.14f;</code></p>
+    </section>
+
+    <!-- 17. Toán tử -->
+    <section class="slide">
+      <h2>Toán tử phổ biến</h2>
+      <ul>
+        <li><strong>Số học</strong>: <code class="inline">+</code>, <code class="inline">-</code>, <code class="inline">*</code>, <code class="inline">/</code>, <code class="inline">%</code></li>
+        <li><strong>Gán</strong>: <code class="inline">=</code>, <code class="inline">+=</code>, <code class="inline">-=</code>...</li>
+        <li><strong>So sánh</strong>: <code class="inline">==</code>, <code class="inline">!=</code>, <code class="inline">&gt;</code>, <code class="inline">&lt;</code>, <code class="inline">&gt;=</code>, <code class="inline">&lt;=</code></li>
+        <li><strong>Logic</strong>: <code class="inline">&amp;&amp;</code>, <code class="inline">||</code>, <code class="inline">!</code></li>
+        <li><strong>Điều kiện</strong>: <code class="inline">?:</code> (ternary)</li>
+      </ul>
+      <pre><code>int a = 7, b = 3;
+int sum = a + b;         // 10
+boolean ok = (a > b) && (b > 0);  // true
+String s = (a % 2 == 0) ? "chẵn" : "lẻ";</code></pre>
+    </section>
+
+    <!-- 18. if / else -->
+    <section class="slide">
+      <h2>Câu lệnh if / else</h2>
+      <pre><code>int x = 10;
+
+if (x > 0) {
+    System.out.println("Số dương");
+} else if (x == 0) {
+    System.out.println("Bằng 0");
+} else {
+    System.out.println("Số âm");
+}</code></pre>
+      <p class="small">Khối lệnh dùng <code class="inline">{ }</code>. Một câu lệnh đơn có thể bỏ ngoặc, nhưng nên giữ cho rõ ràng.</p>
+    </section>
+
+    <!-- 19. Ví dụ if / else -->
+    <section class="slide">
+      <h2>Ví dụ: kiểm tra chẵn/lẻ & tìm số lớn hơn</h2>
+      <div class="two-col">
+        <pre><code>// Chẵn / lẻ
+int n = 15;
+if (n % 2 == 0) {
+    System.out.println("Chẵn");
+} else {
+    System.out.println("Lẻ");
+}</code></pre>
+        <pre><code>// Max của hai số
+int a = 5, b = 9;
+int max;
+if (a > b) {
+    max = a;
+} else {
+    max = b;
+}
+System.out.println("Max = " + max);</code></pre>
+      </div>
+    </section>
+
+    <!-- 20. Lỗi thường gặp -->
+    <section class="slide">
+      <h2>Lỗi thường gặp (cảnh báo)</h2>
+      <ul>
+        <li><mark>So sánh String</mark>: dùng <code class="inline">.equals()</code>, không dùng <code class="inline">==</code></li>
+        <li><mark>Chia số nguyên</mark>: <code class="inline">5 / 2 == 2</code>, muốn 2.5 dùng <code class="inline">5.0 / 2</code></li>
+        <li><mark>Thiếu dấu chấm phẩy</mark> hoặc dấu ngoặc nhọn</li>
+        <li><mark>Tên file ≠ tên lớp public</mark> → lỗi biên dịch</li>
+      </ul>
+      <pre><code>// Sai
+String s1 = "Hi", s2 = new String("Hi");
+System.out.println(s1 == s2);     // có thể false
+
+// Đúng
+System.out.println(s1.equals(s2)); // true</code></pre>
+      <div class="cards" style="margin-top: 12px;">
+        <div class="card"><div class="icon">🧪</div><h3>So sánh String</h3><p>Dùng <code class="inline">equals()</code> để so nội dung.</p></div>
+        <div class="card"><div class="icon">➗</div><h3>Chia số nguyên</h3><p>Ép kiểu sang số thực để giữ phần thập phân.</p></div>
+        <div class="card"><div class="icon">❗</div><h3>Chấm phẩy/ngoặc</h3><p>Thiếu ký tự cú pháp → compile error.</p></div>
+        <div class="card"><div class="icon">📄</div><h3>Tên file/lớp</h3><p>Tên file phải trùng lớp <code class="inline">public</code>.</p></div>
+      </div>
+    </section>
+
+    <!-- 21. Nhập xuất cơ bản (tham khảo) -->
+    <section class="slide">
+      <h2>Nhập dữ liệu từ bàn phím (tham khảo)</h2>
+      <pre><code>import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Nhập tên: ");
+        String name = sc.nextLine();
+        System.out.println("Xin chào " + name);
+        sc.close();
+    }
+}</code></pre>
+      <p class="small">Sẽ dùng trong bài tập về nhà.</p>
+    </section>
+
+    <!-- 22. Tổng kết -->
+    <section class="slide">
+      <h2>Tổng kết</h2>
+      <ul>
+        <li>Hiểu khái niệm Java, JVM/JRE/JDK</li>
+        <li>Cài đặt JDK và IDE</li>
+        <li>Viết, biên dịch, chạy Hello World</li>
+        <li>Nắm cấu trúc cơ bản, biến, kiểu, toán tử</li>
+        <li>Sử dụng <code class="inline">if / else</code></li>
+      </ul>
+      <div class="pill-list">
+        <span class="pill">JDK</span>
+        <span class="pill">IDE</span>
+        <span class="pill">Hello World</span>
+        <span class="pill">Biến/Toán tử</span>
+        <span class="pill">if / else</span>
+      </div>
+    </section>
+
+    <!-- 23. Bài tập về nhà -->
+    <section class="slide">
+      <h2>Bài tập về nhà</h2>
+      <ol>
+        <li>Cài JDK (17/21) và một IDE. Gửi ảnh chụp <code class="inline">java -version</code>.</li>
+        <li>Tạo chương trình in ra họ tên và tuổi (2 biến) theo mẫu:
+          <pre><code>Họ tên: ...
+Tuổi: ...</code></pre>
+        </li>
+        <li>Viết chương trình nhập 2 số nguyên, in:
+          <ul>
+            <li>Tổng, hiệu, tích, thương (dạng số thực)</li>
+            <li>Số lớn hơn</li>
+            <li>Cả hai đều chẵn? (true/false)</li>
+          </ul>
+        </li>
+        <li>Nâng cao (tuỳ chọn): nhập điểm (0–10), in xếp loại:
+          <ul>
+            <li>&ge; 8.5: Giỏi; 7.0–8.4: Khá; 5.5–6.9: Trung bình; 0–5.4: Yếu</li>
+          </ul>
+        </li>
+      </ol>
+      <p class="small">Đặt tên file và lớp đúng quy tắc. Format code gọn gàng.</p>
+    </section>
+
+    <!-- 24. Q&A -->
+    <section class="slide">
+      <h2>Q&A</h2>
+      <p>Thắc mắc về cài đặt, cú pháp, hoặc bài tập? Hỏi ngay tại đây.</p>
+      <p class="muted">Gợi ý: thử viết lại ví dụ theo cách của bạn.</p>
+    </section>
+  </div>
+
+  <div class="footer">
+    <div class="controls">
+      <button class="button" id="prevBtn" aria-label="Previous slide"><span>Previous</span></button>
+      <button class="button" id="nextBtn" aria-label="Next slide"><span>Next</span></button>
+    </div>
+    <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+    <div class="help">Dùng phím <kbd>←</kbd>/<kbd>→</kbd> hoặc nhấn nút để điều hướng</div>
+  </div>
+
+<script>
+(function () {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const progressBar = document.getElementById('progressBar');
+  const deck = document.getElementById('deck');
+
+  const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
+  const total = slides.length;
+  let index = getIndexFromHash() ?? 0;
+
+  function getIndexFromHash() {
+    const h = window.location.hash;
+    if (!h) return null;
+    const m = h.match(/#\/?(\d+)/);
+    if (!m) return null;
+    const n = parseInt(m[1], 10);
+    return Number.isFinite(n) ? clamp(n, 0, total - 1) : null;
+  }
+
+  function setHash(i) {
+    // keep URL lightweight; don't spam history
+    const target = `#/${i}`;
+    if (window.location.hash !== target) {
+      history.replaceState(null, '', target);
+    }
+  }
+
+  function show(i, opts = { animate: true }) {
+    index = clamp(i, 0, total - 1);
+    slides.forEach((s, idx) => {
+      if (idx === index) s.classList.add('active');
+      else s.classList.remove('active');
+    });
+    const pct = ((index + 1) / total) * 100;
+    progressBar.style.width = pct + '%';
+    prevBtn.disabled = index === 0;
+    nextBtn.disabled = index === total - 1;
+
+    // Optional reduced motion support
+    if (!opts.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      slides.forEach(s => { s.style.transition = 'none'; });
+      requestAnimationFrame(() => {
+        slides.forEach(s => { s.style.transition = ''; });
+      });
+    }
+    setHash(index);
+  }
+
+  function next() { if (index < total - 1) show(index + 1); }
+  function prev() { if (index > 0) show(index - 1); }
+  function first() { show(0); }
+  function last() { show(total - 1); }
+
+  // Init
+  show(index, { animate: false });
+
+  // Events
+  nextBtn.addEventListener('click', next);
+  prevBtn.addEventListener('click', prev);
+
+  // Click anywhere on deck to go next (except when clicking buttons/links)
+  deck.addEventListener('click', (e) => {
+    const target = e.target;
+    if (target.closest('button,a,pre,code,table,tbody,thead,td,th,kbd')) return;
+    next();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    // Avoid interfering with text selection inside code blocks
+    const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+    if (tag === 'input' || tag === 'textarea') return;
+
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'PageDown':
+      case ' ':
+        e.preventDefault();
+        next();
+        break;
+      case 'ArrowLeft':
+      case 'PageUp':
+        e.preventDefault();
+        prev();
+        break;
+      case 'Home':
+        e.preventDefault();
+        first();
+        break;
+      case 'End':
+        e.preventDefault();
+        last();
+        break;
+      case 'g': // go to via prompt (optional)
+        e.preventDefault();
+        const v = prompt(`Đi tới slide (0-${total - 1}):`, String(index));
+        if (v === null) return;
+        const n = parseInt(v, 10);
+        if (Number.isFinite(n)) show(n);
+        break;
+      default:
+        break;
+    }
+  });
+
+  window.addEventListener('hashchange', () => {
+    const hIdx = getIndexFromHash();
+    if (hIdx !== null && hIdx !== index) show(hIdx);
+  });
+
+  // Expose small API for debugging (optional)
+  window.Slides = { next, prev, first, last, show, get index() { return index; }, total };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Slides Java — tdthanh.dev</title>
+  <meta name="description" content="Trang index dẫn tới các slide buổi học Java." />
+  <meta name="author" content="tdthanh.dev" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #0b1220;
+      --ink: #e6edf3;
+      --muted: #94a3b8;
+      --line: #22324a;
+      --accent: #00bcd4;
+      --accent-2: #7c3aed;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1000px 500px at 100% 0%, rgba(124,58,237,.08), transparent 60%),
+                  radial-gradient(900px 450px at 0% 100%, rgba(0,188,212,.10), transparent 60%),
+                  var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica Neue, Arial;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+    }
+
+    .container {
+      width: min(960px, 100%);
+      background: rgba(11, 18, 32, 0.7);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 28px 28px 22px;
+      backdrop-filter: blur(6px);
+    }
+
+    /* Top navigation */
+    .navbar {
+      position: sticky;
+      top: 0; left: 0; right: 0;
+      backdrop-filter: blur(6px);
+      background: rgba(2, 6, 23, 0.45);
+      border-bottom: 1px solid #111827;
+      z-index: 10;
+    }
+    .nav-inner { max-width: 1100px; margin: 0 auto; padding: 12px 22px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { color: var(--ink); text-decoration: none; font-weight: 800; font-size: 18px; letter-spacing: .2px; }
+    .brand:hover { opacity: .85; }
+    .author { color: var(--muted); font-size: 14px; }
+
+    /* Hero */
+    .hero { padding: 8px 4px 10px; }
+    .hero h1 { font-size: 44px; margin-bottom: 8px; }
+    .lead { font-size: 18px; color: var(--muted); max-width: 70ch; }
+    .cta { margin-top: 16px; display: flex; gap: 10px; }
+
+    /* Buttons */
+    .btn {
+      appearance: none; border: 1px solid var(--line); color: var(--ink);
+      background: #0b1220; padding: 10px 14px; border-radius: 10px; cursor: pointer;
+      text-decoration: none; font-weight: 600; font-size: 14px;
+      transition: background .2s ease, transform .06s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .btn:hover { background: #0f1a2b; border-color: #3a4b6b; }
+    .btn:active { transform: translateY(1px); }
+    .btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0,188,212,.25); }
+    .btn--primary { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-color: transparent; }
+    .btn--primary:hover { filter: brightness(1.05); }
+    .btn--ghost { background: transparent; }
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 40px;
+      letter-spacing: .2px;
+    }
+    p { margin: 0 0 18px 0; color: var(--muted); font-size: 18px; }
+    hr { border: none; height: 1px; background: linear-gradient(90deg, transparent, #334155, transparent); margin: 12px 0 20px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    a.card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--ink);
+      background: #0b1220;
+      border: 1px solid var(--line);
+      padding: 18px 16px;
+      border-radius: 14px;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+    }
+    a.card:hover { transform: translateY(-1px); background: #0f1a2b; border-color: #3a4b6b; }
+
+    .title { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .badge { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #0f172a; border: 1px solid #334155; color: #cbd5e1; }
+    .desc { font-size: 14px; color: var(--muted); }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+
+    .footer { margin-top: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .hint { font-size: 14px; color: var(--muted); }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+  <script>
+    // Phím tắt: Ctrl/Cmd + Enter để mở nhanh Buổi 1
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'enter') {
+        window.location.href = 'Buoi1.html';
+      }
+    });
+  </script>
+  <base target="_self" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%2300bcd4'/%3E%3Ctext x='50' y='58' font-size='46' text-anchor='middle' fill='white' font-family='Arial,Helvetica,sans-serif'%3EJ%3C/text%3E%3C/svg%3E" />
+  
+</head>
+<body>
+  <header class="navbar" role="banner">
+    <div class="nav-inner">
+      <a class="brand" href="./" aria-label="Trang chủ">tdthanh.dev</a>
+      <nav class="nav-actions" aria-label="Tác giả">
+        <span class="author">Tác giả: tdthanh.dev</span>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">Bộ slide học Java</h1>
+      <p class="lead">Chọn buổi học để bắt đầu. Nội dung biên soạn bởi <strong>tdthanh.dev</strong>.</p>
+      <div class="cta">
+        <a class="btn btn--primary" href="Buoi1.html" target="_blank" rel="noopener noreferrer">Mở Buổi 1</a>
+        <a class="btn btn--ghost" href="#syllabus">Xem đề cương</a>
+      </div>
+    </section>
+    <hr />
+
+      <section id="syllabus" class="grid" aria-label="Danh sách buổi">
+        <a class="card" href="Buoi1.html" target="_blank" rel="noopener noreferrer">
+        <div class="title">Buổi 1: Nền tảng Java</div>
+        <div class="desc">Giới thiệu Java, cài JDK/IDE, Hello World, cấu trúc cơ bản, biến/kiểu/toán tử, if/else, tổng kết & bài tập.</div>
+        <div class="tags">
+          <span class="badge">Hello World</span>
+          <span class="badge">Kiểu dữ liệu</span>
+          <span class="badge">if/else</span>
+        </div>
+      </a>
+
+        <a class="card" href="Buoi2.html" target="_blank" rel="noopener noreferrer">
+          <div class="title">Buổi 2: Vòng lặp & mảng</div>
+          <div class="desc">for/while/do-while, break/continue, mảng 1 chiều, duyệt mảng, bài tập thực hành.</div>
+          <div class="tags">
+            <span class="badge">for/while</span>
+            <span class="badge">Array</span>
+            <span class="badge">Practice</span>
+          </div>
+        </a>
+
+        <a class="card" href="Buoi3.html" target="_blank" rel="noopener noreferrer">
+          <div class="title">Buổi 3: Hàm & phạm vi</div>
+          <div class="desc">Định nghĩa hàm, tham số/trả về, overload, phạm vi biến, debug cơ bản, bài tập.</div>
+          <div class="tags">
+            <span class="badge">Functions</span>
+            <span class="badge">Scope</span>
+            <span class="badge">Overload</span>
+          </div>
+        </a>
+
+        <a class="card" href="Buoi4.html" target="_blank" rel="noopener noreferrer">
+          <div class="title">Buổi 4: OOP căn bản</div>
+          <div class="desc">Class, object, constructor, encapsulation, getter/setter, bài tập mô phỏng đơn giản.</div>
+          <div class="tags">
+            <span class="badge">Class</span>
+            <span class="badge">Object</span>
+            <span class="badge">Encapsulation</span>
+          </div>
+        </a>
+
+      <!-- Khi có thêm slide, nhân bản mẫu dưới đây và đổi liên kết
+      <a class="card" href="Buoi2.html">
+        <div class="title">Buổi 2: ...</div>
+        <div class="desc">Mô tả ngắn nội dung buổi 2.</div>
+      </a>
+      -->
+    </section>
+
+    <div class="footer">
+      <span class="hint">© 2025 tdthanh.dev — Tác giả: tdthanh.dev</span>
+      <button class="btn" onclick="location.reload()">Làm mới</button>
+    </div>
+  </main>
+</body>
+</html>
+
+
