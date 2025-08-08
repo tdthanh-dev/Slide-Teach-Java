@@ -205,6 +205,13 @@
     max-height: 60vh;
     width: 100%;
   }
+  /* lightweight syntax colors for inline-highlighted code */
+  code.hl .k { color: #7dd3fc; }
+  code.hl .t { color: #5eead4; }
+  code.hl .fn { color: #c4b5fd; }
+  code.hl .str { color: #f9a8d4; }
+  code.hl .num { color: #fde68a; }
+  code.hl .cmt { color: #9ca3af; font-style: italic; }
   code.inline {
     background: #0b1220;
     border: 1px solid #23324a;
@@ -723,7 +730,120 @@ Tuổi: ...</code></pre>
       <p class="small">Đặt tên file và lớp đúng quy tắc. Format code gọn gàng.</p>
     </section>
 
-    <!-- 24. Q&A -->
+    <!-- 24. Bài tập tổng hợp (3 bài - overview) -->
+    <section class="slide">
+      <h2>Bài tập tổng hợp</h2>
+      <div class="cards" role="list">
+        <div class="card" role="listitem">
+          <div class="icon">🧮</div>
+          <h3>BT1: Kiểm tra nguyên tố</h3>
+          <p>Viết hàm kiểm tra số nguyên n có là số nguyên tố hay không.</p>
+        </div>
+        <div class="card" role="listitem">
+          <div class="icon">📝</div>
+          <h3>BT2: Proper case Họ Tên</h3>
+          <p>Hàm nhận chuỗi họ tên, trả về dạng Proper: mỗi từ viết hoa chữ cái đầu.</p>
+        </div>
+        <div class="card" role="listitem">
+          <div class="icon">⚙️</div>
+          <h3>BT3: Mã nhị phân</h3>
+          <p>Hàm xuất ra mã nhị phân của số nguyên dương n.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 25. BT1 - đề -->
+    <section class="slide">
+      <h2>BT1: Kiểm tra số nguyên tố</h2>
+      <p>Viết hàm <code class="inline">isPrime(n)</code> trả về <code class="inline">true/false</code> với n ≥ 0.</p>
+      <ul>
+        <li>0, 1 không phải số nguyên tố.</li>
+        <li>Chỉ chia hết cho 1 và chính nó.</li>
+        <li>Tối ưu: chỉ cần thử tới √n.</li>
+      </ul>
+    </section>
+
+    <!-- 26. BT1 - code -->
+    <section class="slide">
+      <h2>Lời giải gợi ý — BT1</h2>
+      <pre><code class="hl"><span class="t">public</span> <span class="t">class</span> <span class="t">Main</span> {
+    <span class="t">public</span> <span class="t">static</span> <span class="t">boolean</span> <span class="fn">isPrime</span>(<span class="t">int</span> n) {
+        <span class="cmt">// 0 và 1 không phải số nguyên tố</span>
+        <span class="t">if</span> (n &lt; <span class="num">2</span>) <span class="t">return</span> <span class="t">false</span>;
+        <span class="t">if</span> (n == <span class="num">2</span>) <span class="t">return</span> <span class="t">true</span>;
+        <span class="t">if</span> (n % <span class="num">2</span> == <span class="num">0</span>) <span class="t">return</span> <span class="t">false</span>;
+        <span class="t">int</span> limit = (<span class="t">int</span>) <span class="t">Math</span>.<span class="fn">sqrt</span>(n);
+        <span class="t">for</span> (<span class="t">int</span> i = <span class="num">3</span>; i &lt;= limit; i += <span class="num">2</span>) {
+            <span class="t">if</span> (n % i == <span class="num">0</span>) <span class="t">return</span> <span class="t">false</span>;
+        }
+        <span class="t">return</span> <span class="t">true</span>;
+    }
+}</code></pre>
+    </section>
+
+    <!-- 27. BT2 - đề -->
+    <section class="slide">
+      <h2>BT2: Proper case Họ Tên</h2>
+      <p>Viết hàm <code class="inline">toProperName(fullName)</code> chuẩn hoá họ tên: xoá khoảng trắng thừa và viết hoa chữ cái đầu mỗi từ.</p>
+      <ul>
+        <li>Ví dụ: "  nGuyEn   vAn   A  " → "Nguyen Van A"</li>
+        <li>Gợi ý: <code class="inline">trim()</code>, <code class="inline">split</code> theo khoảng trắng, <code class="inline">toLowerCase()</code>, <code class="inline">toUpperCase()</code>.</li>
+      </ul>
+    </section>
+
+    <!-- 28. BT2 - code -->
+    <section class="slide">
+      <h2>Lời giải gợi ý — BT2</h2>
+      <pre><code class="hl"><span class="t">public</span> <span class="t">class</span> <span class="t">Main</span> {
+    <span class="t">public</span> <span class="t">static</span> <span class="t">String</span> <span class="fn">toProperName</span>(<span class="t">String</span> fullName) {
+        <span class="t">if</span> (fullName == <span class="t">null</span>) <span class="t">return</span> <span class="str">""</span>;
+        fullName = fullName.<span class="fn">trim</span>().<span class="fn">toLowerCase</span>();
+        <span class="t">if</span> (fullName.<span class="fn">isEmpty</span>()) <span class="t">return</span> <span class="str">""</span>;
+        <span class="t">String</span>[] parts = fullName.<span class="fn">split</span>(<span class="str">"\\s+"</span>);
+        <span class="t">StringBuilder</span> result = <span class="t">new</span> <span class="t">StringBuilder</span>();
+        <span class="t">for</span> (<span class="t">String</span> p : parts) {
+            <span class="t">if</span> (p.<span class="fn">isEmpty</span>()) <span class="t">continue</span>;
+            result.<span class="fn">append</span>(<span class="t">Character</span>.<span class="fn">toUpperCase</span>(p.<span class="fn">charAt</span>(<span class="num">0</span>)))
+                  .<span class="fn">append</span>(p.<span class="fn">substring</span>(<span class="num">1</span>));
+            result.<span class="fn">append</span>(<span class="str">" "</span>);
+        }
+        <span class="t">return</span> result.<span class="fn">toString</span>().<span class="fn">trim</span>();
+    }
+}</code></pre>
+    </section>
+
+    <!-- 29. BT3 - đề -->
+    <section class="slide">
+      <h2>BT3: Xuất mã nhị phân của n</h2>
+      <p>Viết hàm <code class="inline">toBinary(n)</code> trả về chuỗi nhị phân của số nguyên dương n.</p>
+      <ul>
+        <li>Dùng phép chia lấy dư 2 và lưu ngược.</li>
+        <li>Xử lý n = 0 → "0".</li>
+      </ul>
+    </section>
+
+    <!-- 30. BT3 - code -->
+    <section class="slide">
+      <h2>Lời giải gợi ý — BT3</h2>
+      <pre><code class="hl"><span class="t">public</span> <span class="t">class</span> <span class="t">Main</span> {
+    <span class="t">public</span> <span class="t">static</span> <span class="t">String</span> <span class="fn">toBinary</span>(<span class="t">int</span> n) {
+        <span class="t">if</span> (n == <span class="num">0</span>) <span class="t">return</span> <span class="str">"0"</span>;
+        <span class="t">StringBuilder</span> sb = <span class="t">new</span> <span class="t">StringBuilder</span>();
+        <span class="t">while</span> (n &gt; <span class="num">0</span>) {
+            sb.<span class="fn">append</span>(n % <span class="num">2</span>);
+            n /= <span class="num">2</span>;
+        }
+        <span class="t">return</span> sb.<span class="fn">reverse</span>().<span class="fn">toString</span>();
+    }
+}</code></pre>
+    </section>
+
+    <!-- 31. Q&A -->
+    <section class="slide">
+      <h2>Q&A</h2>
+      <p>Thắc mắc về cài đặt, cú pháp, hoặc bài tập? Hỏi ngay tại đây.</p>
+      <p class="muted">Gợi ý: thử viết lại ví dụ theo cách của bạn.</p>
+    </section>
     <section class="slide">
       <h2>Q&A</h2>
       <p>Thắc mắc về cài đặt, cú pháp, hoặc bài tập? Hỏi ngay tại đây.</p>
