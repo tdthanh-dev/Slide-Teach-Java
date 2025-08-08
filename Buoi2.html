@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java 101 — Buổi 2 (Vòng lặp & Mảng)</title>
+<meta name="description" content="Slide trình chiếu buổi học Java — Buổi 2: Vòng lặp & Mảng" />
+<style>
+  :root {
+    --bg: #0e1117;
+    --panel: #0b1220;
+    --ink: #e6edf3;
+    --muted: #a1a1aa;
+    --line: #23324a;
+    --code-bg: #111827;
+    --code-line: #1f2937;
+    --accent: #00bcd4;
+    --accent-2: #7c3aed;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, Apple Color Emoji, Segoe UI Emoji;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .slides { position: relative; width: 100vw; height: 100vh; isolation: isolate;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(124, 58, 237, 0.07), transparent 60%),
+      radial-gradient(1000px 500px at 0% 100%, rgba(0, 188, 212, 0.09), transparent 60%);
+  }
+  .slide { position: absolute; inset: 0; padding: 64px 72px; display: grid; align-content: center; justify-items: start; gap: 24px; opacity: 0; transform: translateX(40px) scale(.985); transition: opacity .4s ease, transform .5s ease; pointer-events: none; }
+  .slide.active { opacity: 1; transform: translateX(0) scale(1); pointer-events: auto; }
+
+  h1, h2, h3 { margin: 0; line-height: 1.1; }
+  h1 { font-size: 54px; letter-spacing: .2px; }
+  h2 { font-size: 38px; color: var(--accent); }
+  h3 { font-size: 26px; color: #cbd5e1; }
+  p { font-size: 22px; line-height: 1.6; margin: 0; }
+  ul, ol { font-size: 22px; line-height: 1.6; margin: 0; padding-left: 22px; }
+  li { margin: 6px 0; }
+  .muted { color: var(--muted); }
+  .small { font-size: 18px; color: var(--muted); }
+  .badge { display: inline-block; background: var(--panel); border: 1px solid var(--line); color: #cbd5e1; padding: 3px 10px; border-radius: 999px; font-size: 14px; margin-left: 8px; }
+
+  .two-col { display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; align-items: start; }
+  .callout { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; width: 100%; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: 0 20px 40px rgba(2, 6, 23, 0.15); transition: transform .15s ease, border-color .2s ease, background .2s ease; }
+  .card:hover { transform: translateY(-3px); border-color: #334155; background: #0f172a; }
+  .card .icon { font-size: 26px; line-height: 1; }
+  .pill-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .pill { background: #0b1220; border: 1px solid #1f2937; color: #cbd5e1; padding: 6px 10px; border-radius: 999px; font-size: 14px; white-space: nowrap; }
+
+  pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  pre { background: var(--code-bg); color: #e5e7eb; border: 1px solid var(--code-line); border-radius: 12px; padding: 18px 20px; font-size: 18px; overflow: auto; max-height: 60vh; width: 100%; }
+  code.inline { background: #0b1220; border: 1px solid #23324a; padding: 2px 6px; border-radius: 6px; font-size: 90%; }
+
+  /* Exercise layout */
+  .exercise { width: 100%; }
+  .exercise .problem { font-size: 22px; }
+  .exercise .grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; align-items: start; margin-top: 10px; }
+  .exercise .grid3 { display: grid; grid-template-columns: 1fr 130px 1fr; gap: 16px; align-items: start; margin-top: 10px; }
+  .run-btn { align-self: center; justify-self: center; background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: #fff; border: none; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-weight: 700; }
+  .run-btn:hover { filter: brightness(1.05); }
+  .terminal { background: #0b1220; border: 1px solid #22324a; border-radius: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 16px; color: #e5e7eb; }
+  .terminal .header { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid #1f2937; background: #0a0f1a; }
+  .dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
+  .dot.r { background: #ef4444; } .dot.y { background: #f59e0b; } .dot.g { background: #22c55e; }
+  .terminal pre { margin: 0; padding: 14px 16px; max-height: 40vh; }
+  .hidden { display: none; }
+
+  .footer { position: fixed; left: 0; right: 0; bottom: 0; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; background: rgba(2, 6, 23, 0.55); backdrop-filter: blur(6px); border-top: 1px solid #111827; z-index: 10; }
+  .controls { display: flex; gap: 8px; }
+  .button { background: var(--panel); color: var(--ink); border: 1px solid var(--line); padding: 8px 14px; border-radius: 10px; font-size: 16px; cursor: pointer; transition: background .2s, transform .05s, opacity .2s; }
+  .button:hover { background: #0f1a2b; }
+  .button:active { transform: translateY(1px); }
+  .button[disabled] { opacity: .5; cursor: not-allowed; }
+  .progress { height: 6px; background: var(--panel); border-radius: 999px; border: 1px solid var(--line); overflow: hidden; width: 32%; }
+  .progress > span { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .3s ease; }
+  .help { font-size: 14px; color: var(--muted); }
+
+  @media print {
+    body, .slides, .slide { position: static; height: auto; }
+    .slide { page-break-after: always; opacity: 1 !important; transform: none !important; }
+    .footer { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="slides" id="deck">
+    <!-- 1. Title -->
+    <section class="slide active">
+      <h1>Java 101 — Buổi 2</h1>
+      <h2>Vòng lặp & Mảng</h2>
+      <p class="muted">Thời lượng: ~3 giờ <span class="badge">Desktop</span> <span class="badge">HTML/CSS/JS thuần</span></p>
+    </section>
+
+    <!-- 2. Agenda -->
+    <section class="slide">
+      <h2>Nội dung buổi 2</h2>
+      <ul>
+        <li>Tổng quan vòng lặp: for, while, do-while</li>
+        <li>break, continue</li>
+        <li>Giới thiệu mảng: khai báo, khởi tạo, duyệt</li>
+        <li>Bài tập thực hành</li>
+      </ul>
+    </section>
+
+    <!-- 3. Tổng quan vòng lặp -->
+    <section class="slide">
+      <h2>Vòng lặp là gì?</h2>
+      <div class="cards">
+        <div class="card"><div class="icon">🔁</div><h3>for</h3><p>Biết trước số lần lặp, tiện gọn.</p></div>
+        <div class="card"><div class="icon">🔄</div><h3>while</h3><p>Lặp khi điều kiện còn đúng.</p></div>
+        <div class="card"><div class="icon">↩️</div><h3>do-while</h3><p>Chạy ít nhất một lần rồi mới kiểm tra.</p></div>
+      </div>
+    </section>
+
+    <!-- 4. for -->
+    <section class="slide">
+      <h2>for</h2>
+      <pre><code>for (int i = 0; i &lt; 5; i++) {
+    System.out.println("i = " + i);
+}</code></pre>
+      <p class="small">Khởi tạo → Điều kiện → Thân → Bước nhảy.</p>
+    </section>
+
+    <!-- 5. while -->
+    <section class="slide">
+      <h2>while</h2>
+      <pre><code>int n = 3;
+while (n &gt; 0) {
+    System.out.println(n);
+    n--;
+}</code></pre>
+      <p class="small">Kiểm tra điều kiện trước khi vào thân.</p>
+    </section>
+
+    <!-- 6. do-while -->
+    <section class="slide">
+      <h2>do-while</h2>
+      <pre><code>int x = 0;
+do {
+    System.out.println("Chạy ít nhất 1 lần");
+    x++;
+} while (x &lt; 1);</code></pre>
+      <p class="small">Luôn chạy ít nhất 1 lần.</p>
+    </section>
+
+    <!-- 7. break / continue -->
+    <section class="slide">
+      <h2>break / continue</h2>
+      <div class="two-col">
+        <pre><code>// break: thoát vòng lặp hiện tại
+for (int i = 0; i &lt; 10; i++) {
+    if (i == 5) break;
+    System.out.print(i + " ");
+}</code></pre>
+        <pre><code>// continue: bỏ qua lần lặp hiện tại
+for (int i = 0; i &lt; 6; i++) {
+    if (i % 2 == 0) continue;
+    System.out.print(i + " ");
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- 8. Mảng - khai báo/khởi tạo -->
+    <section class="slide">
+      <h2>Mảng — Khai báo & khởi tạo</h2>
+      <div class="two-col">
+        <ul>
+          <li>Khai báo: <code class="inline">int[] a;</code></li>
+          <li>Khởi tạo: <code class="inline">a = new int[5];</code></li>
+          <li>Gán phần tử: <code class="inline">a[0] = 10;</code></li>
+          <li>Độ dài: <code class="inline">a.length</code></li>
+        </ul>
+        <pre><code>int[] a = { 2, 5, 1, 9 };
+System.out.println(a.length); // 4</code></pre>
+      </div>
+    </section>
+
+    <!-- 9. Duyệt mảng -->
+    <section class="slide">
+      <h2>Duyệt mảng</h2>
+      <div class="two-col">
+        <pre><code>// for chỉ số
+int sum = 0;
+for (int i = 0; i &lt; a.length; i++) {
+    sum += a[i];
+}</code></pre>
+        <pre><code>// for-each
+int max = Integer.MIN_VALUE;
+for (int v : a) {
+    if (v &gt; max) max = v;
+}</code></pre>
+      </div>
+      <p class="small">for-each đọc/duyệt tiện hơn khi không cần chỉ số.</p>
+    </section>
+
+    <!-- 10. Bài tập thực hành -->
+    <section class="slide">
+      <h2>Bài tập thực hành</h2>
+      <ol>
+        <li>Nhập n, in tổng 1..n và giai thừa n! (dùng for).</li>
+        <li>Nhập mảng n số, in max/min và trung bình.</li>
+        <li>Đếm số lượng số chẵn lẻ trong mảng.</li>
+      </ol>
+    </section>
+
+    <!-- 11. Bài tập 1: Tổng 1..n & giai thừa (đề + chạy) -->
+    <section class="slide">
+      <h2>Bài tập 1: Tổng 1..n & giai thừa</h2>
+      <div class="exercise">
+        <div class="problem">Viết chương trình nhập <code class="inline">n</code> (n ≥ 0), in tổng 1..n và giai thừa <code class="inline">n!</code>.</div>
+        <div class="grid3">
+          <pre id="ex1-code" class="hidden"><code>// Code mẫu (tham khảo)
+int n = 5; // ví dụ
+int sum = 0;
+int fact = 1;
+for (int i = 1; i <= n; i++) {
+    sum += i;
+    fact *= i;
+}
+System.out.println("sum = " + sum);
+System.out.println("fact = " + fact);
+          </code></pre>
+          <div style="display:grid; gap:8px; align-content:start;">
+            <button class="run-btn" data-toggle="#ex1-code">Xem code mẫu</button>
+            <button class="run-btn" data-toggle="#ex1-out-pre">Xem kết quả</button>
+          </div>
+          <div class="terminal" id="ex1-out" aria-live="polite">
+            <div class="header"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="muted" style="margin-left:6px; font-size: 12px;">Terminal</span></div>
+            <pre id="ex1-out-pre" class="hidden"><code>Input: n = 5
+sum = 15
+fact = 120
+Process finished with exit code 0</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. Bài tập 2: Thống kê mảng (đề + chạy) -->
+    <section class="slide">
+      <h2>Bài tập 2: Thống kê mảng</h2>
+      <div class="exercise">
+        <div class="problem">Nhập mảng số nguyên, in <strong>min/max</strong> và <strong>trung bình</strong>.</div>
+        <div class="grid3">
+          <pre id="ex2-code" class="hidden"><code>// Code mẫu (tham khảo)
+int[] a = {3, 7, 2, 9, 4};
+int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
+int sum = 0;
+for (int v : a) { min = Math.min(min, v); max = Math.max(max, v); sum += v; }
+double avg = (double) sum / a.length;
+System.out.printf("min = %d\nmax = %d\navg = %.1f\n", min, max, avg);
+          </code></pre>
+          <div style="display:grid; gap:8px; align-content:start;">
+            <button class="run-btn" data-toggle="#ex2-code">Xem code mẫu</button>
+            <button class="run-btn" data-toggle="#ex2-out-pre">Xem kết quả</button>
+          </div>
+          <div class="terminal" id="ex2-out" aria-live="polite">
+            <div class="header"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="muted" style="margin-left:6px; font-size: 12px;">Terminal</span></div>
+            <pre id="ex2-out-pre" class="hidden"><code>Input: a = [3, 7, 2, 9, 4]
+min = 2
+max = 9
+avg = 5.0
+Process finished with exit code 0</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13. Bài tập 3: Đếm chẵn/lẻ (đề + chạy) -->
+    <section class="slide">
+      <h2>Bài tập 3: Đếm số chẵn/lẻ</h2>
+      <div class="exercise">
+        <div class="problem">Nhập mảng số nguyên, in số lượng phần tử <strong>chẵn</strong> và <strong>lẻ</strong>.</div>
+        <div class="grid3">
+          <pre id="ex3-code" class="hidden"><code>// Code mẫu (tham khảo)
+int[] a = {1, 2, 3, 4, 6};
+int even = 0, odd = 0;
+for (int v : a) { if (v % 2 == 0) even++; else odd++; }
+System.out.printf("even = %d\nodd  = %d\n", even, odd);
+          </code></pre>
+          <div style="display:grid; gap:8px; align-content:start;">
+            <button class="run-btn" data-toggle="#ex3-code">Xem code mẫu</button>
+            <button class="run-btn" data-toggle="#ex3-out-pre">Xem kết quả</button>
+          </div>
+          <div class="terminal" id="ex3-out" aria-live="polite">
+            <div class="header"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="muted" style="margin-left:6px; font-size: 12px;">Terminal</span></div>
+            <pre id="ex3-out-pre" class="hidden"><code>Input: a = [1, 2, 3, 4, 6]
+even = 3
+odd  = 2
+Process finished with exit code 0</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14. Q&A -->
+    <section class="slide">
+      <h2>Q&A</h2>
+      <p>Thắc mắc về vòng lặp, mảng, hoặc bài tập? Hỏi ngay tại đây.</p>
+    </section>
+  </div>
+
+  <div class="footer">
+    <div class="controls">
+      <button class="button" id="prevBtn" aria-label="Previous slide"><span>Previous</span></button>
+      <button class="button" id="nextBtn" aria-label="Next slide"><span>Next</span></button>
+    </div>
+    <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+    <div class="help">Dùng phím <kbd>←</kbd>/<kbd>→</kbd> hoặc nhấn nút để điều hướng</div>
+  </div>
+
+<script>
+(function () {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const progressBar = document.getElementById('progressBar');
+  const deck = document.getElementById('deck');
+
+  const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
+  const total = slides.length;
+  let index = getIndexFromHash() ?? 0;
+
+  function getIndexFromHash() {
+    const h = window.location.hash;
+    if (!h) return null;
+    const m = h.match(/#\/?(\d+)/);
+    if (!m) return null;
+    const n = parseInt(m[1], 10);
+    return Number.isFinite(n) ? clamp(n, 0, total - 1) : null;
+  }
+
+  function setHash(i) {
+    const target = `#/${i}`;
+    if (window.location.hash !== target) {
+      history.replaceState(null, '', target);
+    }
+  }
+
+  function show(i, opts = { animate: true }) {
+    index = clamp(i, 0, total - 1);
+    slides.forEach((s, idx) => {
+      if (idx === index) s.classList.add('active');
+      else s.classList.remove('active');
+    });
+    const pct = ((index + 1) / total) * 100;
+    progressBar.style.width = pct + '%';
+    prevBtn.disabled = index === 0;
+    nextBtn.disabled = index === total - 1;
+    if (!opts.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      slides.forEach(s => { s.style.transition = 'none'; });
+      requestAnimationFrame(() => { slides.forEach(s => { s.style.transition = ''; }); });
+    }
+    setHash(index);
+  }
+
+  function next() { if (index < total - 1) show(index + 1); }
+  function prev() { if (index > 0) show(index - 1); }
+
+  show(index, { animate: false });
+  nextBtn.addEventListener('click', next);
+  prevBtn.addEventListener('click', prev);
+  deck.addEventListener('click', (e) => {
+    const target = e.target;
+    if (target.closest('button,a,pre,code,table,tbody,thead,td,th,kbd')) return;
+    next();
+  });
+  document.addEventListener('keydown', (e) => {
+    const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+    if (tag === 'input' || tag === 'textarea') return;
+    switch (e.key) {
+      case 'ArrowRight': case 'PageDown': case ' ': e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'PageUp': e.preventDefault(); prev(); break;
+      case 'Home': e.preventDefault(); show(0); break;
+      case 'End': e.preventDefault(); show(total - 1); break;
+      default: break;
+    }
+  });
+  window.addEventListener('hashchange', () => { const hIdx = getIndexFromHash(); if (hIdx !== null && hIdx !== index) show(hIdx); });
+  window.Slides = { next, prev, show, get index() { return index; }, total };
+
+  // Toggle terminals when clicking "Xem kết quả"
+  function setupToggles() {
+    document.querySelectorAll('.run-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const selector = btn.getAttribute('data-toggle');
+        if (!selector) return;
+        const el = document.querySelector(selector);
+        if (!el) return;
+        el.classList.toggle('hidden');
+      });
+    });
+  }
+  setupToggles();
+})();
+</script>
+</body>
+</html>
+
