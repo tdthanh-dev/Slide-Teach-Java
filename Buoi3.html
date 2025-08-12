@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Java 101 — Buổi 3: Hàm (Method) trong Java</title>
+  <meta name="description" content="Slide buổi 3: Hàm (Method) trong Java từ cơ bản đến nâng cao - khái niệm, cấu trúc, tham số, overloading, scope, recursion." />
+  <style>
+    :root {
+      --bg: #0e1117;
+      --panel: #0b1220;
+      --ink: #e6edf3;
+      --muted: #a1a1aa;
+      --line: #23324a;
+      --code-bg: #111827;
+      --code-line: #1f2937;
+      --accent: #00bcd4;
+      --accent-2: #7c3aed;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --warn: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, Apple Color Emoji, Segoe UI Emoji;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .slides {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      isolation: isolate;
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(124, 58, 237, 0.07), transparent 60%),
+        radial-gradient(1000px 500px at 0% 100%, rgba(0, 188, 212, 0.09), transparent 60%);
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 64px 72px;
+      display: grid;
+      align-content: center;
+      justify-items: start;
+      gap: 24px;
+      opacity: 0;
+      transform: translateX(40px) scale(.985);
+      transition: opacity .4s ease, transform .5s ease;
+      pointer-events: none;
+    }
+    .slide.active { opacity: 1; transform: translateX(0) scale(1); pointer-events: auto; }
+
+    h1, h2, h3 { margin: 0; line-height: 1.1; }
+    h1 { font-size: 50px; letter-spacing: .2px; }
+    h2 { font-size: 36px; color: var(--accent); }
+    h3 { font-size: 24px; color: #cbd5e1; }
+    p { font-size: 22px; line-height: 1.6; margin: 0; }
+    ul, ol { font-size: 22px; line-height: 1.6; margin: 0; padding-left: 22px; }
+    li { margin: 6px 0; }
+    .muted { color: var(--muted); }
+    .small { font-size: 18px; color: var(--muted); }
+    .callout { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+    .quote { font-size: 22px; color: #cbd5e1; border-left: 3px solid var(--accent); padding-left: 12px; }
+    mark { background: rgba(0, 188, 212, 0.15); color: #a7f3d0; padding: 0 6px; border-radius: 6px; }
+    kbd { background: #1f2937; color: #e5e7eb; padding: 2px 8px; border-radius: 6px; border: 1px solid #374151; font-weight: 600; font-size: 14px; }
+
+    .two-col { display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; align-items: start; }
+    .two-col > div > pre { margin-top: 8px; }
+
+    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    pre { background: var(--code-bg); color: #e5e7eb; border: 1px solid var(--code-line); border-radius: 12px; padding: 18px 20px; font-size: 18px; overflow: auto; max-height: 60vh; width: 100%; }
+    code.inline { background: #0b1220; border: 1px solid #23324a; padding: 2px 6px; border-radius: 6px; font-size: 90%; }
+    /* Java syntax theme */
+    pre code .tok-keyword { color: #c792ea; }
+    pre code .tok-type { color: #82aaff; }
+    pre code .tok-annotation { color: #c3e88d; }
+    pre code .tok-string { color: #ecc48d; }
+    pre code .tok-number { color: #f78c6c; }
+    pre code .tok-boolean, pre code .tok-null { color: #f78c6c; }
+    pre code .tok-operator { color: #89ddff; }
+    pre code .tok-comment { color: #637777; font-style: italic; }
+
+    .footer {
+      position: fixed; left: 0; right: 0; bottom: 0; height: 48px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 14px; background: rgba(2, 6, 23, 0.55); backdrop-filter: blur(6px); border-top: 1px solid #111827; z-index: 10;
+    }
+    .controls { display: flex; gap: 8px; }
+    .button { background: var(--panel); color: var(--ink); border: 1px solid var(--line); padding: 8px 14px; border-radius: 10px; font-size: 16px; cursor: pointer; transition: background .2s, transform .05s, opacity .2s; }
+    .button:hover { background: #0f1a2b; }
+    .button:active { transform: translateY(1px); }
+    .button[disabled] { opacity: .5; cursor: not-allowed; }
+    .progress { height: 6px; background: var(--panel); border-radius: 999px; border: 1px solid var(--line); overflow: hidden; width: 32%; }
+    .progress > span { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .3s ease; }
+    .help { font-size: 14px; color: var(--muted); }
+
+    /* Toggle content styles */
+    .toggle-content {
+      margin-top: 16px;
+    }
+    .toggle-btn {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+    .toggle-btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+    .toggle-btn:active {
+      transform: translateY(0);
+    }
+    .content-section {
+      display: none;
+      margin-top: 12px;
+      animation: slideIn 0.3s ease;
+    }
+    .content-section.show {
+      display: block;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media print { body, .slides, .slide { position: static; height: auto; } .slide { page-break-after: always; opacity: 1 !important; transform: none !important; } .footer { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="slides" id="deck">
+    <!-- 1. Title -->
+    <section class="slide active">
+      <h1>Java 101 — Buổi 3</h1>
+      <h2>Hàm (Method) trong Java</h2>
+      <p class="muted">Từ khái niệm cơ bản đến nâng cao: cấu trúc, tham số, overloading, scope, recursion và best practices.</p>
+      <div class="quote">"Hàm tốt giống như công cụ chính xác: làm đúng một việc, làm tốt việc đó."</div>
+    </section>
+
+    <!-- 2. Agenda -->
+    <section class="slide">
+      <h2>Nội dung buổi học</h2>
+      <ol>
+        <li>Khái niệm cơ bản về hàm</li>
+        <li>Cấu trúc của một phương thức</li>
+        <li>Tham số và giá trị trả về</li>
+        <li>Phân loại phương thức</li>
+        <li>Overloading (nạp chồng phương thức)</li>
+        <li>Scope và Lifetime của biến</li>
+        <li>Gọi phương thức</li>
+        <li>Các từ khóa liên quan</li>
+        <li>Hàm đệ quy (Recursion)</li>
+        <li>Best Practices</li>
+      </ol>
+    </section>
+
+    <!-- 3. Khái niệm cơ bản -->
+    <section class="slide">
+      <h2>1. Khái niệm cơ bản</h2>
+      <p><strong>Hàm (method)</strong> trong Java là một khối mã thực hiện một nhiệm vụ cụ thể.</p>
+      <ul>
+        <li>Giúp chia chương trình thành các phần nhỏ dễ quản lý</li>
+        <li>Có thể nhận dữ liệu đầu vào (parameters) và trả về kết quả (return value)</li>
+      </ul>
+      
+      <h3>Lợi ích:</h3>
+      <ul>
+        <li><mark>Tái sử dụng:</mark> Viết một lần, dùng nhiều lần</li>
+        <li><mark>Bảo trì dễ dàng:</mark> Sửa trong một hàm sẽ ảnh hưởng toàn bộ nơi gọi</li>
+        <li><mark>Dễ đọc:</mark> Chia nhỏ logic, code gọn hơn</li>
+      </ul>
+
+      <h3>Ví dụ:</h3>
+<pre><code>public int congHaiSo(int a, int b) {
+    return a + b;
+}
+</code></pre>
+    </section>
+
+    <!-- Bài tập 1: Khái niệm cơ bản -->
+    <section class="slide">
+      <h2>🏋️ Bài tập 1: Tạo hàm cơ bản</h2>
+      <div class="callout">
+        <h3>Đề bài:</h3>
+        <p>Viết hàm <code class="inline">tinhDienTichHinhChuNhat</code> nhận vào chiều dài và chiều rộng, trả về diện tích. Sau đó gọi hàm trong <code class="inline">main</code> và in kết quả.</p>
+      </div>
+
+      <div class="toggle-content">
+        <button class="toggle-btn" onclick="toggleContent(this, 'code1')">📝 Xem Code Mẫu</button>
+        <div id="code1" class="content-section">
+          <h3>Code mẫu:</h3>
+<pre><code>public class BaiTap1 {
+    public static double tinhDienTichHinhChuNhat(double dai, double rong) {
+        return dai * rong;
+    }
+    
+    public static void main(String[] args) {
+        double dienTich = tinhDienTichHinhChuNhat(5.5, 3.2);
+        System.out.println("Diện tích hình chữ nhật: " + dienTich);
+        
+        // Thử với giá trị khác
+        System.out.println("Diện tích 10x8: " + tinhDienTichHinhChuNhat(10, 8));
+    }
+}
+</code></pre>
+        </div>
+
+        <button class="toggle-btn" onclick="toggleContent(this, 'result1')">🖥️ Xem Kết Quả</button>
+        <div id="result1" class="content-section">
+          <h3>Kết quả chạy:</h3>
+<pre><code>$ javac BaiTap1.java
+$ java BaiTap1
+Diện tích hình chữ nhật: 17.6
+Diện tích 10x8: 80.0
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Cấu trúc phương thức -->
+    <section class="slide">
+      <h2>2. Cấu trúc của một phương thức</h2>
+      <h3>Cú pháp:</h3>
+<pre><code>[modifier] returnType methodName(parameterList) {
+    // code
+    return value; // nếu có return
+}
+</code></pre>
+
+      <h3>Giải thích thành phần:</h3>
+      <ul>
+        <li><strong>Modifier:</strong> quyền truy cập (<code class="inline">public</code>, <code class="inline">private</code>, <code class="inline">protected</code>, <code class="inline">static</code>, <code class="inline">final</code>, <code class="inline">abstract</code>)</li>
+        <li><strong>Return type:</strong> kiểu dữ liệu trả về (<code class="inline">int</code>, <code class="inline">String</code>, <code class="inline">boolean</code>, <code class="inline">void</code>...)</li>
+        <li><strong>Method name:</strong> đặt tên theo camelCase (<code class="inline">tinhTong</code>, <code class="inline">getName</code>...)</li>
+        <li><strong>Parameter list:</strong> danh sách tham số, có thể rỗng hoặc nhiều</li>
+        <li><strong>Method body:</strong> chứa lệnh cần chạy</li>
+        <li><strong>return:</strong> trả về kết quả nếu không phải <code class="inline">void</code></li>
+      </ul>
+    </section>
+
+    <!-- 5. Ví dụ cấu trúc -->
+    <section class="slide">
+      <h2>Ví dụ cấu trúc phương thức</h2>
+<pre><code>public String xinChao(String ten) {
+    return "Xin chào, " + ten;
+}
+</code></pre>
+
+      <div class="callout">
+        <h3>Phân tích:</h3>
+        <ul>
+          <li><code class="inline">public</code> - modifier (public access)</li>
+          <li><code class="inline">String</code> - return type</li>
+          <li><code class="inline">xinChao</code> - method name</li>
+          <li><code class="inline">(String ten)</code> - parameter list</li>
+          <li><code class="inline">return "Xin chào, " + ten;</code> - method body & return</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 6. Modifier chi tiết -->
+    <section class="slide">
+      <h2>Access Modifiers chi tiết</h2>
+      <div class="two-col">
+        <div>
+          <ul>
+            <li><strong>public:</strong> dùng được ở bất kỳ đâu</li>
+            <li><strong>private:</strong> chỉ dùng được trong class hiện tại</li>
+            <li><strong>protected:</strong> dùng trong class hiện tại + class con + cùng package</li>
+            <li><strong>static:</strong> thuộc về class, không thuộc riêng một đối tượng</li>
+            <li><strong>final:</strong> không thể override</li>
+            <li><strong>abstract:</strong> chỉ khai báo, chưa có thân hàm</li>
+          </ul>
+        </div>
+        <div>
+<pre><code>public class Demo {
+    public void method1() { }      // public
+    private void method2() { }     // private
+    protected void method3() { }   // protected
+    static void method4() { }      // static
+    final void method5() { }       // final
+}
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bài tập 2: Cấu trúc phương thức -->
+    <section class="slide">
+      <h2>🏋️ Bài tập 2: Sử dụng Access Modifiers</h2>
+      <div class="callout">
+        <h3>Đề bài:</h3>
+        <p>Tạo class <code class="inline">Calculator</code> với các hàm có access modifier khác nhau. Thử gọi từ class khác và quan sát lỗi compile.</p>
+      </div>
+
+      <div class="toggle-content">
+        <button class="toggle-btn" onclick="toggleContent(this, 'code2')">📝 Xem Code Mẫu</button>
+        <div id="code2" class="content-section">
+          <h3>Code mẫu:</h3>
+<pre><code>// File: Calculator.java
+public class Calculator {
+    public static int cong(int a, int b) {
+        return a + b;
+    }
+    
+    private static int tru(int a, int b) {
+        return a - b;
+    }
+    
+    protected static int nhan(int a, int b) {
+        return a * b;
+    }
+    
+    static int chia(int a, int b) { // package-private
+        return a / b;
+    }
+}
+
+// File: TestCalculator.java
+public class TestCalculator {
+    public static void main(String[] args) {
+        System.out.println("Cộng: " + Calculator.cong(10, 5));
+        // System.out.println("Trừ: " + Calculator.tru(10, 5)); // ERROR: private
+        System.out.println("Nhân: " + Calculator.nhan(10, 5));
+        System.out.println("Chia: " + Calculator.chia(10, 5));
+    }
+}
+</code></pre>
+        </div>
+
+        <button class="toggle-btn" onclick="toggleContent(this, 'result2')">🖥️ Xem Kết Quả</button>
+        <div id="result2" class="content-section">
+          <h3>Kết quả chạy:</h3>
+<pre><code>$ javac Calculator.java TestCalculator.java
+$ java TestCalculator
+Cộng: 15
+Nhân: 50
+Chia: 2
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Tham số và giá trị trả về -->
+    <section class="slide">
+      <h2>3. Tham số và giá trị trả về</h2>
+      <p><strong>Tham số:</strong> giá trị đưa vào hàm khi gọi.</p>
+      
+      <h3>Truyền tham trị (pass by value):</h3>
+      <ul>
+        <li><strong>Với kiểu nguyên thủy</strong> (<code class="inline">int</code>, <code class="inline">double</code>, <code class="inline">boolean</code>...): Java truyền bản sao giá trị → thay đổi trong hàm không ảnh hưởng bên ngoài</li>
+        <li><strong>Với object:</strong> Java truyền bản sao của tham chiếu → thay đổi bên trong hàm sẽ ảnh hưởng đối tượng gốc</li>
+      </ul>
+
+      <h3>Ví dụ:</h3>
+<pre><code>void tangSo(int x) {
+    x = x + 1; // chỉ thay bản sao, bên ngoài không đổi
+}
+
+int so = 5;
+tangSo(so);
+System.out.println(so); // vẫn là 5
+</code></pre>
+    </section>
+
+    <!-- 8. Ví dụ pass by value với object -->
+    <section class="slide">
+      <h2>Pass by value với Object</h2>
+      <div class="two-col">
+        <div>
+<pre><code>// Thay đổi nội dung object
+void changeArray(int[] arr) {
+    arr[0] = 100; // thay đổi nội dung
+}
+
+int[] numbers = {1, 2, 3};
+changeArray(numbers);
+System.out.println(numbers[0]); // 100
+</code></pre>
+        </div>
+        <div>
+<pre><code>// Gán lại reference
+void reassignArray(int[] arr) {
+    arr = new int[]{7, 8, 9}; // chỉ thay bản sao reference
+}
+
+int[] numbers = {1, 2, 3};
+reassignArray(numbers);
+System.out.println(numbers[0]); // vẫn là 1
+</code></pre>
+        </div>
+      </div>
+      <p class="small">Java luôn pass-by-value, nhưng với object thì value chính là địa chỉ tham chiếu.</p>
+    </section>
+
+    <!-- Bài tập 3: Pass by value -->
+    <section class="slide">
+      <h2>🏋️ Bài tập 3: Hiểu Pass by Value</h2>
+      <div class="callout">
+        <h3>Đề bài:</h3>
+        <p>Viết 2 hàm: một thay đổi primitive, một thay đổi array. Quan sát sự khác biệt kết quả.</p>
+      </div>
+
+      <div class="toggle-content">
+        <button class="toggle-btn" onclick="toggleContent(this, 'code3')">📝 Xem Code Mẫu</button>
+        <div id="code3" class="content-section">
+          <h3>Code mẫu:</h3>
+<pre><code>public class PassByValueDemo {
+    public static void thayDoiSo(int x) {
+        x = 999;
+        System.out.println("Trong hàm thayDoiSo: x = " + x);
+    }
+    
+    public static void thayDoiMang(int[] arr) {
+        arr[0] = 999;
+        System.out.println("Trong hàm thayDoiMang: arr[0] = " + arr[0]);
+    }
+    
+    public static void ganLaiMang(int[] arr) {
+        arr = new int[]{777, 888};
+        System.out.println("Trong hàm ganLaiMang: arr[0] = " + arr[0]);
+    }
+    
+    public static void main(String[] args) {
+        int so = 5;
+        System.out.println("Trước khi gọi: so = " + so);
+        thayDoiSo(so);
+        System.out.println("Sau khi gọi: so = " + so);
+        
+        int[] mang = {1, 2, 3};
+        System.out.println("Trước khi gọi: mang[0] = " + mang[0]);
+        thayDoiMang(mang);
+        System.out.println("Sau thayDoiMang: mang[0] = " + mang[0]);
+        
+        ganLaiMang(mang);
+        System.out.println("Sau ganLaiMang: mang[0] = " + mang[0]);
+    }
+}
+</code></pre>
+        </div>
+
+        <button class="toggle-btn" onclick="toggleContent(this, 'result3')">🖥️ Xem Kết Quả</button>
+        <div id="result3" class="content-section">
+          <h3>Kết quả chạy:</h3>
+<pre><code>$ javac PassByValueDemo.java
+$ java PassByValueDemo
+Trước khi gọi: so = 5
+Trong hàm thayDoiSo: x = 999
+Sau khi gọi: so = 5
+Trước khi gọi: mang[0] = 1
+Trong hàm thayDoiMang: arr[0] = 999
+Sau thayDoiMang: mang[0] = 999
+Trong hàm ganLaiMang: arr[0] = 777
+Sau ganLaiMang: mang[0] = 999
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. Phân loại phương thức -->
+    <section class="slide">
+      <h2>4. Phân loại phương thức</h2>
+      
+      <h3>Instance method: cần tạo đối tượng để gọi</h3>
+<pre><code>class Test {
+    public void hello() { 
+        System.out.println("Hi"); 
+    }
+}
+Test t = new Test();
+t.hello();
+</code></pre>
+
+      <h3>Static method: gọi trực tiếp qua tên lớp</h3>
+<pre><code>class MathUtils {
+    public static int square(int x) { 
+        return x * x; 
+    }
+}
+MathUtils.square(5);
+</code></pre>
+    </section>
+
+    <!-- 10. Abstract và Getter/Setter -->
+    <section class="slide">
+      <h2>Abstract method và Getter/Setter</h2>
+      
+      <h3>Abstract method: chỉ khai báo, không có thân</h3>
+<pre><code>abstract class Animal {
+    abstract void sound();
+}
+</code></pre>
+
+      <h3>Getter/Setter: truy xuất hoặc thay đổi dữ liệu trong class</h3>
+<pre><code>class Person {
+    private String name;
+    
+    public String getName() { 
+        return name; 
+    }
+    
+    public void setName(String n) { 
+        name = n; 
+    }
+}
+</code></pre>
+    </section>
+
+    <!-- Bài tập 4: Static vs Instance -->
+    <section class="slide">
+      <h2>🏋️ Bài tập 4: Static vs Instance Methods</h2>
+      <div class="callout">
+        <h3>Đề bài:</h3>
+        <p>Tạo class <code class="inline">Counter</code> với instance counter và static counter. Thử tạo nhiều object và quan sát sự khác biệt.</p>
+      </div>
+
+      <div class="toggle-content">
+        <button class="toggle-btn" onclick="toggleContent(this, 'code4')">📝 Xem Code Mẫu</button>
+        <div id="code4" class="content-section">
+          <h3>Code mẫu:</h3>
+<pre><code>public class Counter {
+    private int instanceCount = 0;    // instance variable
+    private static int staticCount = 0;  // static variable
+    
+    public void increment() {         // instance method
+        instanceCount++;
+        staticCount++;
+    }
+    
+    public int getInstanceCount() {   // instance method
+        return instanceCount;
+    }
+    
+    public static int getStaticCount() { // static method
+        return staticCount;
+    }
+    
+    public static void main(String[] args) {
+        Counter c1 = new Counter();
+        Counter c2 = new Counter();
+        
+        c1.increment();
+        c1.increment();
+        c2.increment();
+        
+        System.out.println("c1 instance count: " + c1.getInstanceCount());
+        System.out.println("c2 instance count: " + c2.getInstanceCount());
+        System.out.println("Static count: " + Counter.getStaticCount());
+        System.out.println("Static count qua c1: " + c1.getStaticCount());
+    }
+}
+</code></pre>
+        </div>
+
+        <button class="toggle-btn" onclick="toggleContent(this, 'result4')">🖥️ Xem Kết Quả</button>
+        <div id="result4" class="content-section">
+          <h3>Kết quả chạy:</h3>
+<pre><code>$ javac Counter.java
+$ java Counter
+c1 instance count: 2
+c2 instance count: 1
+Static count: 3
+Static count qua c1: 3
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. Overloading -->
+    <section class="slide">
+      <h2>5. Overloading (nạp chồng phương thức)</h2>
+      <ul>
+        <li>Cùng tên nhưng khác số lượng hoặc kiểu tham số</li>
+        <li>Kiểu trả về không quyết định overloading</li>
+      </ul>
+
+      <h3>Ví dụ:</h3>
+<pre><code>class Calculator {
+    void print(int x) { 
+        System.out.println(x); 
+    }
+    
+    void print(String s) { 
+        System.out.println(s); 
+    }
+    
+    void print(int x, int y) { 
+        System.out.println(x + ", " + y); 
+    }
+}
+</code></pre>
+    </section>
+
+    <!-- 12. Overloading chi tiết -->
+    <section class="slide">
+      <h2>Overloading chi tiết hơn</h2>
+<pre><code>public class MathHelper {
+    // Overload dựa trên số lượng tham số
+    public int add(int a, int b) { 
+        return a + b; 
+    }
+    
+    public int add(int a, int b, int c) { 
+        return a + b + c; 
+    }
+    
+    // Overload dựa trên kiểu tham số
+    public double add(double a, double b) { 
+        return a + b; 
+    }
+    
+    // Overload dựa trên thứ tự tham số
+    public void process(int num, String text) { /* ... */ }
+    public void process(String text, int num) { /* ... */ }
+    
+    // KHÔNG hợp lệ: chỉ khác return type
+    // public double add(int a, int b) { return a + b; } // COMPILE ERROR
+}
+</code></pre>
+    </section>
+
+    <!-- Bài tập 5: Overloading -->
+    <section class="slide">
+      <h2>🏋️ Bài tập 5: Method Overloading</h2>
+      <div class="callout">
+        <h3>Đề bài:</h3>
+        <p>Tạo class <code class="inline">Printer</code> với nhiều phiên bản overload của hàm <code class="inline">print</code> cho các kiểu dữ liệu khác nhau.</p>
+      </div>
+
+      <div class="toggle-content">
+        <button class="toggle-btn" onclick="toggleContent(this, 'code5')">📝 Xem Code Mẫu</button>
+        <div id="code5" class="content-section">
+          <h3>Code mẫu:</h3>
+<pre><code>public class Printer {
+    public static void print(int x) {
+        System.out.println("Số nguyên: " + x);
+    }
+    
+    public static void print(double x) {
+        System.out.println("Số thực: " + x);
+    }
+    
+    public static void print(String s) {
+        System.out.println("Chuỗi: " + s);
+    }
+    
+    public static void print(int x, int y) {
+        System.out.println("Hai số: " + x + ", " + y);
+    }
+    
+    public static void print(String s, int times) {
+        System.out.print("Lặp lại: ");
+        for (int i = 0; i < times; i++) {
+            System.out.print(s + " ");
+        }
+        System.out.println();
+    }
+    
+    public static void main(String[] args) {
+        print(42);
+        print(3.14);
+        print("Hello Java");
+        print(10, 20);
+        print("Hi", 3);
+    }
+}
+</code></pre>
+        </div>
+
+        <button class="toggle-btn" onclick="toggleContent(this, 'result5')">🖥️ Xem Kết Quả</button>
+        <div id="result5" class="content-section">
+          <h3>Kết quả chạy:</h3>
+<pre><code>$ javac Printer.java
+$ java Printer
+Số nguyên: 42
+Số thực: 3.14
+Chuỗi: Hello Java
+Hai số: 10, 20
+Lặp lại: Hi Hi Hi 
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13. Scope và Lifetime -->
+    <section class="slide">
+      <h2>6. Scope và Lifetime của biến</h2>
+      <ul>
+        <li><strong>Biến cục bộ:</strong> khai báo trong hàm → chỉ dùng trong hàm</li>
+        <li><strong>Biến tham số:</strong> giống biến cục bộ, tồn tại khi hàm đang chạy</li>
+        <li><strong>Biến toàn cục (field):</strong> khai báo trong class → tồn tại cùng đối tượng</li>
+      </ul>
+
+      <h3>Ví dụ:</h3>
+<pre><code>class Demo {
+    int globalVar = 10; // biến toàn cục
+
+    void method(int param) { // param là biến tham số
+        int localVar = 5; // biến cục bộ
+        System.out.println(param + localVar + globalVar);
+    } // localVar và param bị hủy khi kết thúc hàm
+}
+</code></pre>
+    </section>
+
+    <!-- 14. Scope chi tiết -->
+    <section class="slide">
+      <h2>Scope chi tiết với block</h2>
+<pre><code>public class ScopeDemo {
+    private static int classVar = 10;    // class scope
+    private int instanceVar = 20;        // instance scope
+    
+    public void methodDemo(int paramVar) {  // parameter scope
+        int localVar = 30;               // method local scope
+        
+        if (paramVar > 0) {
+            int blockVar = 40;           // block scope
+            System.out.println(blockVar); // OK
+        }
+        // System.out.println(blockVar); // ERROR: out of scope
+        
+        System.out.println(localVar);   // OK
+        System.out.println(paramVar);   // OK
+        System.out.println(instanceVar); // OK
+        System.out.println(classVar);   // OK
+    }
+}
+</code></pre>
+    </section>
+
+    <!-- 15. Gọi phương thức -->
+    <section class="slide">
+      <h2>7. Gọi phương thức</h2>
+      
+      <h3>Cùng lớp:</h3>
+<pre><code>class MyClass {
+    void method1() {
+        this.method2(); // hoặc chỉ method2();
+    }
+    
+    void method2() {
+        System.out.println("Method 2");
+    }
+}
+</code></pre>
+
+      <h3>Khác lớp:</h3>
+<pre><code>OtherClass obj = new OtherClass();
+obj.methodName();
+</code></pre>
+
+      <h3>Static:</h3>
+<pre><code>ClassName.methodName();
+</code></pre>
+    </section>
+
+    <!-- 16. Các từ khóa liên quan -->
+    <section class="slide">
+      <h2>8. Các từ khóa liên quan</h2>
+      
+      <ul>
+        <li><strong>this:</strong> tham chiếu đến đối tượng hiện tại</li>
+        <li><strong>super:</strong> gọi phương thức/biến của lớp cha</li>
+        <li><strong>return:</strong> kết thúc hàm và trả giá trị</li>
+        <li><strong>static:</strong> thuộc về class, dùng chung cho mọi đối tượng</li>
+        <li><strong>final:</strong> không thể override</li>
+      </ul>
+
+<pre><code>class Child extends Parent {
+    private String name;
+    
+    public void setName(String name) {
+        this.name = name;    // this phân biệt field và parameter
+    }
+    
+    public void callParent() {
+        super.parentMethod(); // gọi method của lớp cha
+    }
+}
+</code></pre>
+    </section>
+
+    <!-- Bài tập 6: Scope -->
+    <section class="slide">
+      <h2>🏋️ Bài tập 6: Variable Scope</h2>
+      <div class="callout">
+        <h3>Đề bài:</h3>
+        <p>Tạo class minh họa các loại scope khác nhau và thử truy cập từ các vị trí khác nhau.</p>
+      </div>
+
+      <div class="toggle-content">
+        <button class="toggle-btn" onclick="toggleContent(this, 'code6')">📝 Xem Code Mẫu</button>
+        <div id="code6" class="content-section">
+          <h3>Code mẫu:</h3>
+<pre><code>public class ScopeTest {
+    private static int classVar = 100;  // class scope
+    private int instanceVar = 200;      // instance scope
+    
+    public void testScope(int paramVar) {  // parameter scope
+        int localVar = 300;             // method scope
+        System.out.println("Trong method:");
+        System.out.println("  classVar = " + classVar);
+        System.out.println("  instanceVar = " + instanceVar);
+        System.out.println("  paramVar = " + paramVar);
+        System.out.println("  localVar = " + localVar);
+        
+        if (paramVar > 0) {
+            int blockVar = 400;         // block scope
+            System.out.println("  Trong if: blockVar = " + blockVar);
+        }
+        // System.out.println(blockVar); // ERROR: out of scope
+    }
+    
+    public static void staticMethod() {
+        System.out.println("Trong static method:");
+        System.out.println("  classVar = " + classVar);
+        // System.out.println(instanceVar); // ERROR: can't access instance from static
+    }
+    
+    public static void main(String[] args) {
+        ScopeTest obj = new ScopeTest();
+        obj.testScope(50);
+        staticMethod();
+    }
+}
+</code></pre>
+        </div>
+
+        <button class="toggle-btn" onclick="toggleContent(this, 'result6')">🖥️ Xem Kết Quả</button>
+        <div id="result6" class="content-section">
+          <h3>Kết quả chạy:</h3>
+<pre><code>$ javac ScopeTest.java
+$ java ScopeTest
+Trong method:
+  classVar = 100
+  instanceVar = 200
+  paramVar = 50
+  localVar = 300
+  Trong if: blockVar = 400
+Trong static method:
+  classVar = 100
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 17. Hàm đệ quy -->
+    <section class="slide">
+      <h2>9. Hàm đệ quy (Recursion)</h2>
+      <ul>
+        <li>Hàm tự gọi lại chính nó</li>
+        <li>Phải có điều kiện dừng để tránh vòng lặp vô hạn</li>
+      </ul>
+
+      <h3>Ví dụ tính giai thừa:</h3>
+<pre><code>int factorial(int n) {
+    if (n <= 1) return 1;        // điều kiện dừng (base case)
+    return n * factorial(n - 1); // gọi đệ quy
+}
+
+// Gọi hàm
+System.out.println(factorial(5)); // 120
+</code></pre>
+
+      <p class="small">Cẩn thận: Không có điều kiện dừng sẽ gây StackOverflowError!</p>
+    </section>
+
+    <!-- 18. Ví dụ đệ quy khác -->
+    <section class="slide">
+      <h2>Các ví dụ đệ quy khác</h2>
+      <div class="two-col">
+        <div>
+<pre><code>// Fibonacci
+int fibonacci(int n) {
+    if (n <= 1) return n;
+    return fibonacci(n-1) + fibonacci(n-2);
+}
+
+// Tính tổng từ 1 đến n
+int sum(int n) {
+    if (n <= 0) return 0;
+    return n + sum(n - 1);
+}
+</code></pre>
+        </div>
+        <div>
+<pre><code>// In countdown
+void countdown(int n) {
+    if (n <= 0) {
+        System.out.println("Done!");
+        return;
+    }
+    System.out.println(n);
+    countdown(n - 1);
+}
+
+// Tìm ước chung lớn nhất
+int gcd(int a, int b) {
+    if (b == 0) return a;
+    return gcd(b, a % b);
+}
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bài tập 7: Recursion -->
+    <section class="slide">
+      <h2>🏋️ Bài tập 7: Recursion Practice</h2>
+      <div class="callout">
+        <h3>Đề bài:</h3>
+        <p>Viết các hàm đệ quy: tính tổng từ 1 đến n, tìm số Fibonacci, và đếm ngược.</p>
+      </div>
+
+      <div class="toggle-content">
+        <button class="toggle-btn" onclick="toggleContent(this, 'code7')">📝 Xem Code Mẫu</button>
+        <div id="code7" class="content-section">
+          <h3>Code mẫu:</h3>
+<pre><code>public class RecursionDemo {
+    public static int tinhTong(int n) {
+        if (n <= 0) return 0;           // base case
+        return n + tinhTong(n - 1);     // recursive case
+    }
+    
+    public static int fibonacci(int n) {
+        if (n <= 1) return n;           // base case
+        return fibonacci(n-1) + fibonacci(n-2);  // recursive case
+    }
+    
+    public static void demNguoc(int n) {
+        if (n <= 0) {                   // base case
+            System.out.println("Hết!");
+            return;
+        }
+        System.out.println(n);          // in trước khi gọi đệ quy
+        demNguoc(n - 1);               // recursive case
+    }
+    
+    public static void main(String[] args) {
+        System.out.println("Tổng từ 1 đến 5: " + tinhTong(5));
+        
+        System.out.print("Fibonacci 7 số đầu: ");
+        for (int i = 0; i < 7; i++) {
+            System.out.print(fibonacci(i) + " ");
+        }
+        System.out.println();
+        
+        System.out.println("Đếm ngược từ 5:");
+        demNguoc(5);
+    }
+}
+</code></pre>
+        </div>
+
+        <button class="toggle-btn" onclick="toggleContent(this, 'result7')">🖥️ Xem Kết Quả</button>
+        <div id="result7" class="content-section">
+          <h3>Kết quả chạy:</h3>
+<pre><code>$ javac RecursionDemo.java
+$ java RecursionDemo
+Tổng từ 1 đến 5: 15
+Fibonacci 7 số đầu: 0 1 1 2 3 5 8 
+Đếm ngược từ 5:
+5
+4
+3
+2
+1
+Hết!
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 19. Best Practices -->
+    <section class="slide">
+      <h2>10. Best Practices</h2>
+      <ul>
+        <li><mark>Đặt tên dễ hiểu:</mark> <code class="inline">calculateArea</code> thay vì <code class="inline">cA</code></li>
+        <li><mark>Mỗi hàm chỉ làm một việc</mark></li>
+        <li><mark>Không viết hàm quá dài</mark> → tách nhỏ</li>
+        <li><mark>Tái sử dụng hàm,</mark> tránh lặp code</li>
+      </ul>
+
+      <div class="two-col">
+        <div>
+          <h3>❌ Không tốt:</h3>
+<pre><code>void doStuff() { /* tên mơ hồ */ }
+
+void processUserDataAndSendEmailAndLogActivity() {
+    // quá nhiều việc trong 1 hàm
+    // hàm quá dài
+}
+
+void calc(int x, int y) { /* tên ngắn */ }
+</code></pre>
+        </div>
+        <div>
+          <h3>✅ Tốt:</h3>
+<pre><code>boolean isValidEmail(String email) { /* ... */ }
+
+void processUser() {
+    validateUser();
+    saveUser();
+    sendEmail();
+    logActivity();
+}
+
+double calculateCircleArea(double radius) { /* ... */ }
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 20. Naming Conventions -->
+    <section class="slide">
+      <h2>Naming Conventions chi tiết</h2>
+      <ul>
+        <li><strong>Boolean methods:</strong> bắt đầu bằng <code class="inline">is</code>, <code class="inline">has</code>, <code class="inline">can</code>, <code class="inline">should</code></li>
+        <li><strong>Getter methods:</strong> bắt đầu bằng <code class="inline">get</code></li>
+        <li><strong>Setter methods:</strong> bắt đầu bằng <code class="inline">set</code></li>
+        <li><strong>Action methods:</strong> dùng động từ rõ ràng</li>
+      </ul>
+
+<pre><code>// Good naming examples
+public boolean isEmpty(String text) { /* ... */ }
+public boolean hasNext() { /* ... */ }
+public boolean canAccess(User user) { /* ... */ }
+public String getName() { /* ... */ }
+public void setAge(int age) { /* ... */ }
+public double calculateTax(double amount) { /* ... */ }
+public void processPayment(Payment payment) { /* ... */ }
+public void validateInput(String input) { /* ... */ }
+</code></pre>
+    </section>
+
+    <!-- 21. Thực hành -->
+    <section class="slide">
+      <h2>Thực hành</h2>
+      <ol>
+        <li>Viết hàm <code class="inline">isEven(int n)</code> kiểm tra số chẵn</li>
+        <li>Viết hàm <code class="inline">max(int a, int b)</code> tìm số lớn hơn</li>
+        <li>Viết overload cho hàm <code class="inline">max</code>: <code class="inline">max(int a, int b, int c)</code></li>
+        <li>Viết hàm <code class="inline">countDigits(int n)</code> đếm số chữ số</li>
+        <li>Viết hàm đệ quy <code class="inline">power(int base, int exp)</code></li>
+      </ol>
+
+<pre><code>// Ví dụ giải bài 1:
+public static boolean isEven(int n) {
+    return n % 2 == 0;
+}
+
+// Test
+System.out.println(isEven(4)); // true
+System.out.println(isEven(7)); // false
+</code></pre>
+    </section>
+
+    <!-- 22. Tổng kết -->
+    <section class="slide">
+      <h2>Tổng kết</h2>
+      <ul>
+        <li>Hàm giúp chia nhỏ chương trình, dễ quản lý và tái sử dụng</li>
+        <li>Hiểu rõ cấu trúc: modifier, return type, tên hàm, tham số</li>
+        <li>Java sử dụng pass-by-value cho tất cả tham số</li>
+        <li>Overloading cho phép cùng tên hàm với tham số khác nhau</li>
+        <li>Scope quyết định phạm vi sử dụng biến</li>
+        <li>Đệ quy mạnh mẽ nhưng cần cẩn thận với điều kiện dừng</li>
+        <li>Đặt tên và thiết kế hàm tốt là chìa khóa code clean</li>
+      </ul>
+      
+      <p class="muted">Hàm là nền tảng của lập trình Java. Thành thạo hàm sẽ giúp bạn viết code hiệu quả và chuyên nghiệp!</p>
+    </section>
+  </div>
+
+  <div class="footer">
+    <div class="controls">
+      <button class="button" id="prevBtn" aria-label="Previous slide"><span>Previous</span></button>
+      <button class="button" id="nextBtn" aria-label="Next slide"><span>Next</span></button>
+    </div>
+    <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+    <div class="help">Phím <kbd>←</kbd>/<kbd>→</kbd> • <kbd>Home</kbd>/<kbd>End</kbd> • Nhấn vùng trống để Next</div>
+  </div>
+
+  <script>
+  (function () {
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressBar = document.getElementById('progressBar');
+    const deck = document.getElementById('deck');
+
+    const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
+    const total = slides.length;
+    let index = getIndexFromHash() ?? 0;
+
+    function getIndexFromHash() {
+      const h = window.location.hash;
+      if (!h) return null;
+      const m = h.match(/#\/?(\d+)/);
+      if (!m) return null;
+      const n = parseInt(m[1], 10);
+      return Number.isFinite(n) ? clamp(n, 0, total - 1) : null;
+    }
+
+    function setHash(i) {
+      const target = `#/${i}`;
+      if (window.location.hash !== target) {
+        history.replaceState(null, '', target);
+      }
+    }
+
+    function show(i, opts = { animate: true }) {
+      index = clamp(i, 0, total - 1);
+      slides.forEach((s, idx) => {
+        if (idx === index) s.classList.add('active');
+        else s.classList.remove('active');
+      });
+      const pct = ((index + 1) / total) * 100;
+      progressBar.style.width = pct + '%';
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === total - 1;
+
+      if (!opts.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        slides.forEach(s => { s.style.transition = 'none'; });
+        requestAnimationFrame(() => { slides.forEach(s => { s.style.transition = ''; }); });
+      }
+      setHash(index);
+    }
+
+    function next() { if (index < total - 1) show(index + 1); }
+    function prev() { if (index > 0) show(index - 1); }
+    function first() { show(0); }
+    function last() { show(total - 1); }
+
+    // Init
+    show(index, { animate: false });
+
+    // Events
+    nextBtn.addEventListener('click', next);
+    prevBtn.addEventListener('click', prev);
+
+    deck.addEventListener('click', (e) => {
+      const target = e.target;
+      if (target.closest('button,a,pre,code,table,tbody,thead,td,th,kbd')) return;
+      next();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea') return;
+
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'PageDown':
+        case ' ': e.preventDefault(); next(); break;
+        case 'ArrowLeft':
+        case 'PageUp': e.preventDefault(); prev(); break;
+        case 'Home': e.preventDefault(); first(); break;
+        case 'End': e.preventDefault(); last(); break;
+        case 'g':
+          e.preventDefault();
+          const v = prompt(`Đi tới slide (0-${total - 1}):`, String(index));
+          if (v === null) return;
+          const n = parseInt(v, 10);
+          if (Number.isFinite(n)) show(n);
+          break;
+        default: break;
+      }
+    });
+
+    window.addEventListener('hashchange', () => {
+      const hIdx = getIndexFromHash();
+      if (hIdx !== null && hIdx !== index) show(hIdx);
+    });
+
+    window.Slides = { next, prev, first, last, show, get index() { return index; }, total };
+  })();
+  </script>
+  <script>
+  // Lightweight Java syntax highlighter for code blocks
+  (function(){
+    const KEYWORDS = new RegExp('\\b(abstract|assert|break|case|catch|class|const|continue|default|do|else|enum|extends|final|finally|for|goto|if|implements|import|instanceof|interface|native|new|package|private|protected|public|return|strictfp|super|switch|synchronized|this|throw|throws|transient|try|volatile|while|var)\\b','g');
+    const TYPES = new RegExp('\\b(void|byte|short|int|long|float|double|boolean|char|String|Integer|Long|Double|Float|Boolean|Character|Object|Class|List|ArrayList|Map|HashMap|Set|Scanner|System|Math|Exception)\\b','g');
+    const BOOLNULL = /\b(true|false|null)\b/g;
+    const NUM = /\b\d+(?:\.\d+)?\b/g;
+    const ANNO = /@[A-Za-z_][A-Za-z0-9_]*/g;
+    const LINE_COMMENT = /\/\/[^\n]*/g;
+    const BLOCK_COMMENT = /\/\*[\s\S]*?\*\//g;
+    const STR = /"(?:\\.|[^"\\])*"/g;
+    const CHR = /'(?:\\.|[^'\\])'/g;
+
+    function escapeHtml(s){
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function highlightJava(src){
+      let code = escapeHtml(src);
+      const placeholders = [];
+      function take(regex, cls){
+        code = code.replace(regex, m => {
+          const id = placeholders.push(`<span class="${cls}">${m.replace(/</g,'&lt;')}</span>`) - 1;
+          return `##PLH${id}##`;
+        });
+      }
+      // Protect comments and strings first
+      take(BLOCK_COMMENT, 'tok-comment');
+      take(LINE_COMMENT, 'tok-comment');
+      take(STR, 'tok-string');
+      take(CHR, 'tok-string');
+      // Then highlight remaining tokens
+      code = code
+        .replace(ANNO, '<span class="tok-annotation">$&</span>')
+        .replace(KEYWORDS, '<span class="tok-keyword">$1</span>')
+        .replace(TYPES, '<span class="tok-type">$1</span>')
+        .replace(BOOLNULL, (m, g1) => g1 === 'null' ? '<span class="tok-null">null</span>' : `<span class="tok-boolean">${g1}</span>`)
+        .replace(NUM, '<span class="tok-number">$&</span>');
+      // Restore placeholders
+      code = code.replace(/##PLH(\d+)##/g, (_, i) => placeholders[Number(i)]);
+      return code;
+    }
+
+    function run(){
+      document.querySelectorAll('pre > code').forEach(el => {
+        const raw = el.textContent;
+        el.innerHTML = highlightJava(raw);
+      });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+    else run();
+  })();
+  </script>
+  <script>
+    // Toggle content function for exercise slides
+    function toggleContent(button, contentId) {
+      const content = document.getElementById(contentId);
+      const isShowing = content.classList.contains('show');
+      
+      if (isShowing) {
+        content.classList.remove('show');
+        button.innerHTML = button.innerHTML.replace('🔽 Ẩn', '📝 Xem').replace('🔽 Ẩn', '🖥️ Xem');
+      } else {
+        content.classList.add('show');
+        if (button.innerHTML.includes('Code')) {
+          button.innerHTML = '🔽 Ẩn Code Mẫu';
+        } else {
+          button.innerHTML = '🔽 Ẩn Kết Quả';
+        }
+      }
+    }
+  </script>
+</body>
+</html>
