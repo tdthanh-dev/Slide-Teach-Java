@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buổi 5: Java OOP - Đóng gói & Kế thừa</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --panel: #161b22;
+            --border: #21262d;
+            --text: #c9d1d9;
+            --muted: #8b949e;
+            --accent: #f97316;
+            --accent-2: #ea580c;
+            --success: #238636;
+            --warning: #d29922;
+            --error: #da3633;
+            --line: #30363d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .slides {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 30px 50px 80px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s ease-in-out;
+            background: var(--bg);
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            color: var(--accent);
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 1.4em;
+            margin: 15px 0 10px;
+            color: var(--accent-2);
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 12px;
+        }
+
+        ul,
+        ol {
+            font-size: 1.0em;
+            margin: 12px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        pre {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 12px 0;
+            overflow-x: auto;
+            font-size: 0.9em;
+            line-height: 1.3;
+            max-height: 400px;
+        }
+
+        code.inline {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: var(--panel);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        mark {
+            background: var(--accent);
+            color: var(--bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .callout {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 15px 0;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--panel);
+            border-top: 1px solid var(--border);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .button {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .button:hover {
+            background: #0f1a2b;
+        }
+
+        .button:active {
+            transform: translateY(1px);
+        }
+
+        .button[disabled] {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            height: 6px;
+            background: var(--panel);
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            overflow: hidden;
+            width: 32%;
+        }
+
+        .progress>span {
+            display: block;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            transition: width .3s ease;
+        }
+
+        .help {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 1em;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--panel);
+            font-weight: 600;
+            border-bottom: 2px solid var(--line);
+        }
+
+        td {
+            background-color: var(--panel);
+        }
+
+        .icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .center-image {
+            display: block;
+            margin: 20px auto;
+            max-width: 60%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="slides" id="deck">
+        <!-- Slide 1: Giới thiệu -->
+        <section class="slide active">
+            <h1>Java OOP: Đóng gói & Kế thừa</h1>
+            <p style="text-align: center; font-size: 1.4em; color: var(--muted);">Khám phá hai trụ cột quan trọng của
+                Lập trình Hướng đối tượng</p>
+            <div style="text-align: center; margin-top: 30px;">
+                <p>Lập trình hướng đối tượng (OOP) là một mô hình lập trình mạnh mẽ giúp tổ chức code một cách logic, dễ
+                    hiểu và có khả năng tái sử dụng cao.</p>
+                <p>Trong buổi học này, chúng ta sẽ tập trung sâu vào 2 tính chất cốt lõi:</p>
+                <div class="two-columns" style="max-width: 800px; margin: 30px auto;">
+                    <div class="callout" style="border-color: var(--success);">
+                        <h3><span class="icon">📦</span>Đóng gói (Encapsulation)</h3>
+                    </div>
+                    <div class="callout" style="border-color: var(--warning);">
+                        <h3><span class="icon">🌿</span>Kế thừa (Inheritance)</h3>
+                    </div>
+                </div>
+                <img src="https://i.imgur.com/UPG4FfD.png" alt="OOP Concepts" class="center-image"
+                    style="max-width: 500px;">
+                <p style="color: var(--muted); margin-top: 30px;">Sử dụng phím ← → để điều hướng</p>
+            </div>
+        </section>
+
+        <!-- Slide 2: Khái niệm Đóng gói (Encapsulation) -->
+        <section class="slide">
+            <h2>1. Khái niệm Đóng gói (Encapsulation)</h2>
+            <p><strong>Định nghĩa:</strong> Là kỹ thuật <mark>gói gọn dữ liệu (thuộc tính) và các phương thức xử lý dữ
+                    liệu đó</mark> vào bên trong một đơn vị duy nhất gọi là lớp (class).</p>
+            <p>Mục đích chính là để <mark>che giấu thông tin (information hiding)</mark>, không cho phép các đối tượng
+                khác truy cập trực tiếp vào dữ liệu nội bộ.</p>
+            <div class="two-columns">
+                <div>
+                    <h3>Lợi ích của Đóng gói</h3>
+                    <ul>
+                        <li><span class="icon">🛡️</span><strong>Bảo mật dữ liệu:</strong> Ngăn chặn truy cập trái phép
+                            và sửa đổi dữ liệu.</li>
+                        <li><span class="icon">🕹️</span><strong>Kiểm soát truy cập:</strong> Cung cấp các phương thức
+                            công khai (public methods) để tương tác với dữ liệu một cách có kiểm soát.</li>
+                        <li><span class="icon">🔧</span><strong>Dễ bảo trì và linh hoạt:</strong> Có thể thay đổi cách
+                            cài đặt bên trong lớp mà không ảnh hưởng đến các lớp khác đang sử dụng nó.</li>
+                    </ul>
+                </div>
+                <div>
+                    <img src="https://i.imgur.com/V2k3s7E.png" alt="Encapsulation Diagram" class="center-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Access Modifiers -->
+        <section class="slide">
+            <h2>2. Access Modifiers trong Đóng gói</h2>
+            <p>Java cung cấp các từ khóa (access modifiers) để kiểm soát mức độ truy cập của thuộc tính và phương thức.
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Modifier</th>
+                        <th>Trong cùng Class</th>
+                        <th>Trong cùng Package</th>
+                        <th>Lớp con (ngoài Package)</th>
+                        <th>Bất cứ đâu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code class="inline">public</code></td>
+                        <td style="text-align: center; color: var(--success);">✔️</td>
+                        <td style="text-align: center; color: var(--success);">✔️</td>
+                        <td style="text-align: center; color: var(--success);">✔️</td>
+                        <td style="text-align: center; color: var(--success);">✔️</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline">protected</code></td>
+                        <td style="text-align: center; color: var(--success);">✔️</td>
+                        <td style="text-align: center; color: var(--success);">✔️</td>
+                        <td style="text-align: center; color: var(--success);">✔️</td>
+                        <td style="text-align: center; color: var(--error);">❌</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline">default</code> (không ghi gì)</td>
+                        <td style="text-align: center; color: var(--success);">✔️</td>
+                        <td style="text-align: center; color: var(--success);">✔️</td>
+                        <td style="text-align: center; color: var(--error);">❌</td>
+                        <td style="text-align: center; color: var(--error);">❌</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline">private</code></td>
+                        <td style="text-align: center; color: var(--success);">✔️</td>
+                        <td style="text-align: center; color: var(--error);">❌</td>
+                        <td style="text-align: center; color: var(--error);">❌</td>
+                        <td style="text-align: center; color: var(--error);">❌</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="callout">
+                <p><strong>Quy tắc vàng của Đóng gói:</strong> Luôn khai báo các thuộc tính là <code
+                        class="inline">private</code> và cung cấp các phương thức <code class="inline">public</code>
+                    (getters/setters) để truy cập và thay đổi chúng.</p>
+            </div>
+        </section>
+
+        <!-- Slide 4: Code mẫu Đóng gói -->
+        <section class="slide">
+            <h2>3. Code mẫu: Đóng gói</h2>
+            <p>Ví dụ về lớp <code class="inline">BankAccount</code> áp dụng đóng gói để bảo vệ số dư tài khoản.</p>
+            <pre><code>public class BankAccount {
+    // 1. Thuộc tính được khai báo là private
+    private double balance;
+
+    // Constructor
+    public BankAccount(double initialBalance) {
+        if (initialBalance > 0) {
+            this.balance = initialBalance;
+        }
+    }
+
+    // 2. Public getter để đọc dữ liệu một cách an toàn
+    public double getBalance() {
+        return this.balance;
+    }
+
+    // 3. Public setter (deposit) để thay đổi dữ liệu có kiểm soát
+    public void deposit(double amount) {
+        if (amount > 0) {
+            this.balance += amount;
+            System.out.println("Gửi tiền thành công: " + amount);
+        } else {
+            System.out.println("Số tiền gửi phải lớn hơn 0.");
+        }
+    }
+    
+    public void withdraw(double amount) {
+        if (amount > 0 && amount <= this.balance) {
+            this.balance -= amount;
+            System.out.println("Rút tiền thành công: " + amount);
+        } else {
+            System.out.println("Giao dịch không hợp lệ!");
+        }
+    }
+}</code></pre>
+            <p>Ở đây, không ai có thể trực tiếp thay đổi <code class="inline">balance</code>. Mọi thao tác đều phải
+                thông qua <code class="inline">deposit()</code> hoặc <code class="inline">withdraw()</code>, giúp đảm
+                bảo tính toàn vẹn dữ liệu.</p>
+        </section>
+
+        <!-- Slide 5: Bài tập về Đóng gói -->
+        <section class="slide">
+            <h2>4. 🏋️ Bài tập: Đóng gói</h2>
+            <div class="callout">
+                <h3>Đề bài:</h3>
+                <p>Viết lớp <code class="inline">Student</code> với các thuộc tính <code class="inline">private</code>:
+                    <code class="inline">name</code> (String), <code class="inline">age</code> (int), <code
+                        class="inline">score</code> (double).
+                </p>
+                <p>Cung cấp các phương thức getter/setter công khai cho các thuộc tính trên. Trong đó:</p>
+                <ul>
+                    <li><code class="inline">setAge()</code>: chỉ chấp nhận tuổi từ 6 đến 100.</li>
+                    <li><code class="inline">setScore()</code>: chỉ chấp nhận điểm từ 0.0 đến 10.0.</li>
+                </ul>
+                <p>Tạo một đối tượng Student, gán giá trị (cả hợp lệ và không hợp lệ) và in thông tin ra màn hình.</p>
+            </div>
+            <pre><code>public class Student {
+    private String name;
+    private int age;
+    private double score;
+
+    // Getters
+    public String getName() { return name; }
+    public int getAge() { return age; }
+    public double getScore() { return score; }
+
+    // Setters with validation
+    public void setName(String name) { this.name = name; }
+    public void setAge(int age) {
+        if (age >= 6 && age <= 100) this.age = age;
+        else System.out.println("Tuổi không hợp lệ!");
+    }
+    public void setScore(double score) {
+        if (score >= 0.0 && score <= 10.0) this.score = score;
+        else System.out.println("Điểm không hợp lệ!");
+    }
+
+    public static void main(String[] args) {
+        Student student = new Student();
+        student.setName("Bình An");
+        student.setAge(20); // Hợp lệ
+        student.setScore(8.5); // Hợp lệ
+        System.out.println("Tên: " + student.getName() + ", Tuổi: " + student.getAge() + ", Điểm: " + student.getScore());
+
+        student.setAge(5); // Không hợp lệ
+        student.setScore(11.0); // Không hợp lệ
+    }
+}</code></pre>
+        </section>
+
+        <!-- Slide 6: Khái niệm Kế thừa (Inheritance) -->
+        <section class="slide">
+            <h2>5. Khái niệm Kế thừa (Inheritance)</h2>
+            <p><strong>Định nghĩa:</strong> Là cơ chế cho phép một lớp (lớp con - subclass/child class) <mark>thừa hưởng
+                    lại các thuộc tính và phương thức</mark> từ một lớp khác (lớp cha - superclass/parent class).</p>
+            <p>Sử dụng từ khóa <code class="inline">extends</code> để thể hiện sự kế thừa.</p>
+            <div class="two-columns">
+                <div>
+                    <h3>Lợi ích của Kế thừa</h3>
+                    <ul>
+                        <li><span class="icon">♻️</span><strong>Tái sử dụng code:</strong> Tránh lặp lại code đã được
+                            viết ở lớp cha.</li>
+                        <li><span class="icon">📈</span><strong>Mở rộng tính năng:</strong> Lớp con có thể thêm các
+                            thuộc tính và phương thức mới.</li>
+                        <li><span class="icon">🌳</span><strong>Tổ chức phân cấp:</strong> Tạo ra một hệ thống phân cấp
+                            các lớp có quan hệ cha-con, giúp code có cấu trúc rõ ràng.</li>
+                    </ul>
+                </div>
+                <div>
+                    <img src="https://i.imgur.com/Y1u5B4p.png" alt="Inheritance Diagram" class="center-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Các loại kế thừa trong Java -->
+        <section class="slide">
+            <h2>6. Các loại kế thừa trong Java</h2>
+            <div class="two-columns">
+                <div>
+                    <h3>Single Inheritance (Đơn kế thừa)</h3>
+                    <p>Một lớp con chỉ kế thừa từ một lớp cha duy nhất. Đây là loại kế thừa cơ bản nhất.</p>
+                    <p><code class="inline">class B extends A { ... }</code></p>
+
+                    <h3>Multilevel Inheritance (Kế thừa đa cấp)</h3>
+                    <p>Một lớp con kế thừa từ một lớp cha, và lớp cha đó lại kế thừa từ một lớp ông.</p>
+                    <p><code class="inline">class C extends B { ... }</code> (với B extends A)</p>
+                </div>
+                <div>
+                    <h3>Hierarchical Inheritance (Kế thừa phân cấp)</h3>
+                    <p>Nhiều lớp con cùng kế thừa từ một lớp cha duy nhất.</p>
+                    <p><code class="inline">class B extends A { ... }</code><br><code
+                            class="inline">class C extends A { ... }</code></p>
+                </div>
+            </div>
+            <div class="callout" style="border-color: var(--error);">
+                <h3>Tại sao Java không hỗ trợ Multiple Inheritance (Đa kế thừa)?</h3>
+                <p>Java không cho phép một lớp <code class="inline">extends</code> từ nhiều lớp khác nhau để tránh "Vấn
+                    đề kim cương" (Diamond Problem) - gây ra sự mơ hồ khi lớp con không biết phải gọi phương thức của
+                    lớp cha nào nếu cả hai lớp cha đều có phương thức trùng tên. Tuy nhiên, Java cho phép đa kế thừa
+                    thông qua <code class="inline">interface</code>.</p>
+            </div>
+        </section>
+
+        <!-- Slide 8: Code mẫu Kế thừa -->
+        <section class="slide">
+            <h2>7. Code mẫu: Kế thừa</h2>
+            <p>Ví dụ về lớp <code class="inline">Dog</code> kế thừa các hành vi từ lớp <code
+                    class="inline">Animal</code>.</p>
+            <pre><code>// Lớp cha (Superclass)
+class Animal {
+    String name;
+
+    public Animal(String name) {
+        this.name = name;
+    }
+
+    public void eat() {
+        System.out.println(name + " is eating.");
+    }
+}
+
+// Lớp con (Subclass) kế thừa từ Animal
+class Dog extends Animal {
+    public Dog(String name) {
+        super(name); // Gọi constructor của lớp cha
+    }
+
+    // Phương thức riêng của lớp con
+    public void bark() {
+        System.out.println(name + " is barking: Woof woof!");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog myDog = new Dog("Buddy");
+        myDog.eat();  // <-- Thừa hưởng từ lớp Animal
+        myDog.bark(); // <-- Phương thức của riêng lớp Dog
+    }
+}</code></pre>
+        </section>
+
+        <!-- Slide 9: Ghi đè phương thức (Method Overriding) -->
+        <section class="slide">
+            <h2>8. Ghi đè phương thức (Method Overriding)</h2>
+            <p><strong>Định nghĩa:</strong> Là khi một lớp con cung cấp một <mark>cài đặt cụ thể cho một phương thức đã
+                    được định nghĩa ở lớp cha</mark>.</p>
+            <p>Điều kiện để ghi đè:</p>
+            <ul>
+                <li>Tên phương thức, danh sách tham số phải giống hệt lớp cha.</li>
+                <li>Mức truy cập không được hẹp hơn (ví dụ: <code class="inline">public</code> không thể bị ghi đè thành
+                    <code class="inline">protected</code>).
+                </li>
+            </ul>
+            <p>Sử dụng annotation <code class="inline">@Override</code> là một good practice để trình biên dịch kiểm tra
+                giúp bạn.</p>
+            <pre><code>class Animal {
+    public void makeSound() {
+        System.out.println("Some generic animal sound");
+    }
+}
+
+class Cat extends Animal {
+    // Ghi đè phương thức của lớp cha
+    @Override
+    public void makeSound() {
+        System.out.println("The cat says: Meow meow!");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Animal myAnimal = new Animal();
+        myAnimal.makeSound(); // In ra: Some generic animal sound
+
+        Cat myCat = new Cat();
+        myCat.makeSound(); // In ra: The cat says: Meow meow!
+    }
+}</code></pre>
+        </section>
+
+        <!-- Slide 10: Bài tập về Kế thừa -->
+        <section class="slide">
+            <h2>9. 🏋️ Bài tập: Kế thừa</h2>
+            <div class="callout">
+                <h3>Đề bài:</h3>
+                <ol>
+                    <li>Tạo lớp cha <code class="inline">Person</code> với các thuộc tính <code
+                            class="inline">name</code>, <code class="inline">age</code> và phương thức <code
+                            class="inline">displayInfo()</code> để in thông tin.</li>
+                    <li>Tạo lớp con <code class="inline">Employee</code> kế thừa từ <code class="inline">Person</code>,
+                        thêm thuộc tính <code class="inline">salary</code> (double).</li>
+                    <li>Ghi đè phương thức <code class="inline">displayInfo()</code> trong lớp <code
+                            class="inline">Employee</code> để in thêm cả thông tin về lương.</li>
+                    <li>Tạo đối tượng <code class="inline">Employee</code> và gọi phương thức <code
+                            class="inline">displayInfo()</code> để kiểm tra.</li>
+                </ol>
+            </div>
+            <pre><code>class Person {
+    String name;
+    int age;
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    public void displayInfo() {
+        System.out.println("Name: " + name + ", Age: " + age);
+    }
+}
+
+class Employee extends Person {
+    private double salary;
+    public Employee(String name, int age, double salary) {
+        super(name, age);
+        this.salary = salary;
+    }
+    @Override
+    public void displayInfo() {
+        super.displayInfo(); // Gọi phương thức của lớp cha
+        System.out.println("Salary: $" + salary);
+    }
+}
+
+public class TestEmployee {
+    public static void main(String[] args) {
+        Employee emp = new Employee("John Doe", 30, 75000.0);
+        emp.displayInfo();
+    }
+}</code></pre>
+        </section>
+
+        <!-- Slide 11: So sánh Đóng gói & Kế thừa -->
+        <section class="slide">
+            <h2>10. So sánh Đóng gói & Kế thừa</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tiêu chí</th>
+                        <th>📦 Đóng gói (Encapsulation)</th>
+                        <th>🌿 Kế thừa (Inheritance)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Mục tiêu</strong></td>
+                        <td>Che giấu dữ liệu, bảo vệ sự toàn vẹn của đối tượng.</td>
+                        <td>Tái sử dụng code, tạo mối quan hệ cha-con (is-a).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cách thực hiện</strong></td>
+                        <td>Sử dụng access modifiers (<code class="inline">private</code>) và getters/setters.</td>
+                        <td>Sử dụng từ khóa <code class="inline">extends</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lợi ích chính</strong></td>
+                        <td>Bảo mật, linh hoạt, dễ bảo trì.</td>
+                        <td>Tái sử dụng, mở rộng, cấu trúc phân cấp.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ví dụ</strong></td>
+                        <td>Một lớp <code class="inline">BankAccount</code> ẩn số dư.</td>
+                        <td>Lớp <code class="inline">Dog</code> là một <code class="inline">Animal</code>.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="callout">
+                <h3>Khi nào dùng cái nào?</h3>
+                <p><strong>Ưu tiên Đóng gói:</strong> Hầu như luôn luôn! Đây là nguyên tắc cơ bản để thiết kế lớp tốt.
+                </p>
+                <p><strong>Ưu tiên Kế thừa:</strong> Khi bạn có mối quan hệ "is-a" (một A là một B) rõ ràng và muốn tái
+                    sử dụng code từ lớp cha. Hãy cẩn thận không lạm dụng kế thừa vì nó tạo ra sự phụ thuộc chặt chẽ giữa
+                    các lớp.</p>
+            </div>
+        </section>
+
+        <!-- Slide 12: Tổng kết -->
+        <section class="slide">
+            <h2>11. Tổng kết</h2>
+            <div class="two-columns">
+                <div>
+                    <h3>Những điểm chính</h3>
+                    <ul>
+                        <li><strong>Đóng gói</strong> là về việc "đóng hộp" dữ liệu và phương thức, bảo vệ chúng khỏi sự
+                            can thiệp từ bên ngoài.</li>
+                        <li><strong>Kế thừa</strong> là về việc "thừa hưởng" các đặc tính, cho phép tái sử dụng và mở
+                            rộng code.</li>
+                        <li>Sử dụng <code class="inline">private</code> cho thuộc tính và <code
+                                class="inline">public</code> cho phương thức là nền tảng của đóng gói.</li>
+                        <li>Sử dụng <code class="inline">extends</code> để tạo kế thừa và <code
+                                class="inline">@Override</code> để ghi đè phương thức.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Lời khuyên thực tế</h3>
+                    <ul>
+                        <li>Luôn bắt đầu với các thuộc tính <code class="inline">private</code>.</li>
+                        <li>Chỉ cung cấp getter/setter khi thực sự cần thiết.</li>
+                        <li>"Ưu tiên composition over inheritance" - Cân nhắc sử dụng các đối tượng khác bên trong một
+                            lớp thay vì kế thừa nếu mối quan hệ không phải là "is-a".</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="callout">
+                <h3>Tài liệu tham khảo</h3>
+                <ul>
+                    <li><a href="https://docs.oracle.com/javase/tutorial/java/concepts/index.html"
+                            target="_blank">Oracle Java Tutorials - OOP Concepts</a></li>
+                    <li><a href="https://www.geeksforgeeks.org/object-oriented-programming-oops-concept-in-java/"
+                            target="_blank">GeeksForGeeks - OOP in Java</a></li>
+                    <li><a href="https://www.w3schools.com/java/java_oop.asp" target="_blank">W3Schools - Java OOP</a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="footer">
+        <div class="controls">
+            <button id="prev" class="button">← Trước</button>
+            <div class="progress"><span id="progress-bar"></span></div>
+            <button id="next" class="button">Sau →</button>
+        </div>
+        <div id="slide-counter" class="help">1 / 12</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const deck = document.getElementById('deck');
+            const slides = Array.from(deck.getElementsByClassName('slide'));
+            const prevBtn = document.getElementById('prev');
+            const nextBtn = document.getElementById('next');
+            const progressBar = document.getElementById('progress-bar');
+            const slideCounter = document.getElementById('slide-counter');
+            let current = 0;
+
+            function update() {
+                slides.forEach((slide, i) => {
+                    slide.classList.remove('active', 'prev');
+                    if (i === current) {
+                        slide.classList.add('active');
+                    } else if (i < current) {
+                        slide.classList.add('prev');
+                    }
+                });
+
+                prevBtn.disabled = current === 0;
+                nextBtn.disabled = current === slides.length - 1;
+
+                const progress = (current / (slides.length - 1)) * 100;
+                progressBar.style.width = `${progress}%`;
+                slideCounter.textContent = `${current + 1} / ${slides.length}`;
+            }
+
+            function goTo(index) {
+                if (index >= 0 && index < slides.length) {
+                    current = index;
+                    update();
+                }
+            }
+
+            prevBtn.addEventListener('click', () => goTo(current - 1));
+            nextBtn.addEventListener('click', () => goTo(current + 1));
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') goTo(current + 1);
+                if (e.key === 'ArrowLeft') goTo(current - 1);
+            });
+
+            update();
+        });
+    </script>
+</body>
+
+</html>

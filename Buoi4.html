@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buổi 4: Lập trình hướng đối tượng (OOP) trong Java</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --border: #21262d;
+      --text: #c9d1d9;
+      --muted: #8b949e;
+      --accent: #f97316;
+      --accent-2: #ea580c;
+      --success: #238636;
+      --warning: #d29922;
+      --error: #da3633;
+      --line: #30363d;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', system-ui, sans-serif; 
+      background: var(--bg); 
+      color: var(--text); 
+      line-height: 1.6; 
+      overflow: hidden;
+    }
+
+    .slides { 
+      position: relative; 
+      width: 100vw; 
+      height: 100vh; 
+      overflow: hidden; 
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 30px 50px 80px 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.5s ease-in-out;
+      background: var(--bg);
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .slide.prev {
+      transform: translateX(-100%);
+    }
+
+    h1 { 
+      font-size: 2.8em; 
+      margin-bottom: 20px; 
+      background: linear-gradient(90deg, var(--accent), var(--accent-2)); 
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent; 
+      background-clip: text; 
+      text-align: center;
+    }
+
+    h2 { 
+      font-size: 2.2em; 
+      margin-bottom: 20px; 
+      color: var(--accent); 
+      border-bottom: 3px solid var(--accent); 
+      padding-bottom: 8px; 
+    }
+
+    h3 { 
+      font-size: 1.4em; 
+      margin: 15px 0 10px; 
+      color: var(--accent-2); 
+    }
+
+    p { font-size: 1.1em; margin-bottom: 12px; }
+    
+    ul, ol { 
+      font-size: 1.0em; 
+      margin: 12px 0; 
+      padding-left: 25px; 
+    }
+    
+    li { margin-bottom: 6px; }
+
+    pre {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 15px;
+      margin: 12px 0;
+      overflow-x: auto;
+      font-size: 0.9em;
+      line-height: 1.3;
+      max-height: 400px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Monaco', monospace;
+      background: var(--panel);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    .inline { background: var(--panel); padding: 2px 6px; border-radius: 4px; }
+
+    mark { 
+      background: var(--accent); 
+      color: var(--bg); 
+      padding: 2px 6px; 
+      border-radius: 4px; 
+      font-weight: 600; 
+    }
+
+    .callout {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+    }
+
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 15px 0;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .controls { display: flex; gap: 10px; align-items: center; }
+    .button {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+    .button:hover { background: #0f1a2b; }
+    .button:active { transform: translateY(1px); }
+    .button[disabled] { opacity: .5; cursor: not-allowed; }
+    .progress { height: 6px; background: var(--panel); border-radius: 999px; border: 1px solid var(--line); overflow: hidden; width: 32%; }
+    .progress > span { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .3s ease; }
+    .help { font-size: 14px; color: var(--muted); }
+
+    /* Toggle content styles */
+    .toggle-content {
+      margin-top: 12px;
+    }
+    .toggle-btn {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+      margin-right: 8px;
+      transition: all 0.2s ease;
+    }
+    .toggle-btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+    .toggle-btn:active {
+      transform: translateY(0);
+    }
+    .content-section {
+      display: none;
+      margin-top: 10px;
+      animation: slideIn 0.3s ease;
+    }
+    .content-section.show {
+      display: block;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media print { body, .slides, .slide { position: static; height: auto; } .slide { page-break-after: always; opacity: 1 !important; transform: none !important; } .footer { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="slides" id="deck">
+    <!-- 1. Title -->
+    <section class="slide active">
+      <h1>Buổi 4: Lập trình hướng đối tượng (OOP)</h1>
+      <div style="text-align: center; margin-top: 40px;">
+        <p style="font-size: 1.6em; margin-bottom: 25px;">Object-Oriented Programming trong Java</p>
+        <div style="background: var(--panel); padding: 30px; border-radius: 12px; margin: 30px auto; max-width: 700px;">
+          <h3>Nội dung chính:</h3>
+          <ol style="text-align: left; font-size: 1.2em;">
+            <li>Khái niệm tổng quan OOP</li>
+            <li>Class, Object, Constructor, Access Modifiers</li>
+            <li>4 trụ cột OOP (Encapsulation, Inheritance, Polymorphism, Abstraction)</li>
+            <li>Quan hệ giữa các class & Best Practices</li>
+          </ol>
+        </div>
+        <p style="color: var(--muted); margin-top: 30px;">Sử dụng phím ← → để điều hướng</p>
+      </div>
+    </section>
+
+    <!-- 2. Khái niệm tổng quan OOP -->
+    <section class="slide">
+      <h2>1. Khái niệm tổng quan OOP</h2>
+      <p><strong>OOP (Object-Oriented Programming)</strong> = lập trình dựa trên khái niệm đối tượng (object).</p>
+      
+      <h3>Mục tiêu:</h3>
+      <ul>
+        <li><mark>Mô phỏng</mark> các thực thể ngoài đời thực thành object trong chương trình</li>
+        <li>Giúp code <mark>dễ bảo trì</mark>, <mark>tái sử dụng</mark> và <mark>mở rộng</mark></li>
+      </ul>
+
+      <h3>Đối tượng trong OOP gồm:</h3>
+      <div class="two-columns">
+        <div>
+          <h4>🏷️ Thuộc tính (attributes/fields)</h4>
+          <ul>
+            <li>Dữ liệu, đặc điểm của đối tượng</li>
+            <li>Ví dụ: tên, tuổi, màu sắc...</li>
+          </ul>
+        </div>
+        <div>
+          <h4>⚡ Phương thức (methods)</h4>
+          <ul>
+            <li>Hành vi, chức năng của đối tượng</li>
+            <li>Ví dụ: chạy, bay, tính toán...</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Lưu ý:</strong> Java thuần OOP (trừ kiểu nguyên thủy như int, double).</p>
+      </div>
+
+      <h3>Ví dụ minh họa:</h3>
+<pre><code>// Đối tượng: Xe ô tô
+class Car {
+    // Thuộc tính
+    String brand = "Toyota";
+    int speed = 0;
+    
+    // Phương thức
+    void accelerate() {
+        speed += 10;
+        System.out.println(brand + " tăng tốc lên " + speed + " km/h");
+    }
+}
+</code></pre>
+    </section>
+
+    <!-- 3. Bài tập 1: OOP Overview -->
+    <section class="slide">
+      <h2>🏋️ Bài tập 1: Hiểu khái niệm OOP</h2>
+      <div class="callout">
+        <h3>Đề bài:</h3>
+        <p>Tạo class <code class="inline">Student</code> mô phỏng học sinh với thuộc tính và phương thức cơ bản.</p>
+      </div>
+
+      <div class="toggle-content">
+        <button class="toggle-btn" onclick="toggleContent(this, 'code1')">📝 Xem Code</button>
+        <button class="toggle-btn" onclick="toggleContent(this, 'result1')">🖥️ Kết Quả</button>
+        
+        <div id="code1" class="content-section">
+<pre><code>public class Student {
+    // Thuộc tính (attributes)
+    String name;
+    int age;
+    String major;
+    
+    // Phương thức (methods)
+    void introduce() {
+        System.out.println("Xin chào! Tôi là " + name);
+        System.out.println("Tuổi: " + age + ", Ngành: " + major);
+    }
+    
+    void study(String subject) {
+        System.out.println(name + " đang học " + subject);
+    }
+    
+    public static void main(String[] args) {
+        // Tạo đối tượng Student
+        Student student1 = new Student();
+        student1.name = "Nguyễn Văn An";
+        student1.age = 20;
+        student1.major = "IT";
+        
+        // Gọi các phương thức
+        student1.introduce();
+        student1.study("Java Programming");
+    }
+}
+</code></pre>
+        </div>
+
+        <div id="result1" class="content-section">
+<pre><code>$ javac Student.java
+$ java Student
+Xin chào! Tôi là Nguyễn Văn An
+Tuổi: 20, Ngành: IT
+Nguyễn Văn An đang học Java Programming
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Class (lớp) -->
+    <section class="slide">
+      <h2>2.1 Class (lớp)</h2>
+      <p>Lớp là <mark>khuôn mẫu (blueprint)</mark> để tạo ra đối tượng.</p>
+      
+      <div class="callout">
+        <h3>Class chứa:</h3>
+        <ul>
+          <li><strong>Thuộc tính (fields)</strong> - dữ liệu của đối tượng</li>
+          <li><strong>Phương thức (methods)</strong> - hành vi của đối tượng</li>
+          <li><strong>Constructor</strong> - khởi tạo đối tượng</li>
+        </ul>
+      </div>
+
+      <h3>Ví dụ Class:</h3>
+<pre><code>public class Car {
+    // Thuộc tính (fields)
+    String brand;
+    int speed;
+    
+    // Constructor
+    public Car(String brand) {
+        this.brand = brand;
+        this.speed = 0;
+    }
+    
+    // Phương thức (methods)
+    void run() {
+        System.out.println(brand + " chạy với tốc độ " + speed + " km/h");
+    }
+    
+    void accelerate(int increment) {
+        speed += increment;
+    }
+}
+</code></pre>
+    </section>
+
+    <!-- 5. Object (đối tượng) -->
+    <section class="slide">
+      <h2>2.2 Object (đối tượng)</h2>
+      <p><mark>Thể hiện (instance)</mark> của một class. Tạo đối tượng bằng từ khóa <code class="inline">new</code>.</p>
+      
+      <div class="callout">
+        <h3>Các bước tạo và sử dụng Object:</h3>
+        <ol>
+          <li><strong>Khai báo:</strong> <code class="inline">Car c1;</code></li>
+          <li><strong>Khởi tạo:</strong> <code class="inline">c1 = new Car("Toyota");</code></li>
+          <li><strong>Sử dụng:</strong> <code class="inline">c1.run();</code></li>
+        </ol>
+      </div>
+
+      <h3>Ví dụ sử dụng Object:</h3>
+<pre><code>public class CarTest {
+    public static void main(String[] args) {
+        // Tạo đối tượng Car
+        Car c1 = new Car("Toyota");
+        Car c2 = new Car("Honda");
+        
+        // Gán giá trị và gọi phương thức
+        c1.speed = 60;
+        c2.speed = 80;
+        
+        c1.run();           // Toyota chạy với tốc độ 60 km/h
+        c2.run();           // Honda chạy với tốc độ 80 km/h
+        
+        c1.accelerate(20);  // Tăng tốc
+        c1.run();           // Toyota chạy với tốc độ 80 km/h
+    }
+}
+</code></pre>
+    </section>
+
+    <!-- 6. Bài tập 2: Class và Object -->
+    <section class="slide">
+      <h2>🏋️ Bài tập 2: Class và Object</h2>
+      <div class="callout">
+        <h3>Đề bài:</h3>
+        <p>Tạo class <code class="inline">BankAccount</code> với constructor và các phương thức cơ bản.</p>
+      </div>
+
+      <div class="toggle-content">
+        <button class="toggle-btn" onclick="toggleContent(this, 'code2')">📝 Xem Code</button>
+        <button class="toggle-btn" onclick="toggleContent(this, 'result2')">🖥️ Kết Quả</button>
+        
+        <div id="code2" class="content-section">
+<pre><code>public class BankAccount {
+    String accountNumber;
+    String ownerName;
+    double balance;
+    
+    // Constructor
+    public BankAccount(String accountNumber, String ownerName) {
+        this.accountNumber = accountNumber;
+        this.ownerName = ownerName;
+        this.balance = 0.0;
+    }
+    
+    // Nạp tiền
+    void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            System.out.println("Nạp " + amount + " thành công. Số dư: " + balance);
+        }
+    }
+    
+    // Rút tiền
+    void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            System.out.println("Rút " + amount + " thành công. Số dư: " + balance);
+        } else {
+            System.out.println("Không thể rút tiền!");
+        }
+    }
+    
+    public static void main(String[] args) {
+        BankAccount acc = new BankAccount("12345", "Nguyễn Văn A");
+        acc.deposit(1000000);
+        acc.withdraw(200000);
+    }
+}
+</code></pre>
+        </div>
+
+        <div id="result2" class="content-section">
+<pre><code>$ javac BankAccount.java
+$ java BankAccount
+Nạp 1000000.0 thành công. Số dư: 1000000.0
+Rút 200000.0 thành công. Số dư: 800000.0
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Constructor -->
+    <section class="slide">
+      <h2>2.3 Constructor</h2>
+      <p>Phương thức đặc biệt dùng để <mark>khởi tạo đối tượng</mark>.</p>
+      
+      <div class="callout">
+        <h3>Đặc điểm Constructor:</h3>
+        <ul>
+          <li>Trùng tên với class</li>
+          <li><mark>Không có kiểu trả về</mark> (kể cả void)</li>
+          <li>Được gọi tự động khi tạo object</li>
+          <li>Có thể overload (nhiều constructor)</li>
+        </ul>
+      </div>
+
+      <h3>Ví dụ Constructor:</h3>
+<pre><code>class Student {
+    String name;
+    int age;
+    
+    // Constructor mặc định
+    Student() {
+        name = "Chưa có tên";
+        age = 18;
+    }
+    
+    // Constructor có tham số
+    Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    
+    void displayInfo() {
+        System.out.println("Tên: " + name + ", Tuổi: " + age);
+    }
+}
+
+// Sử dụng
+Student s1 = new Student();                    // Constructor mặc định
+Student s2 = new Student("An", 20);           // Constructor có tham số
+</code></pre>
+    </section>
+
+    <!-- 8. Access Modifiers -->
+    <section class="slide">
+      <h2>2.4 Access Modifiers</h2>
+      <p>Quyền truy cập các thành phần trong class.</p>
+      
+      <div class="two-columns">
+        <div>
+          <h3>🔓 public</h3>
+          <p>Truy cập từ <mark>mọi nơi</mark></p>
+<pre><code>public class Car {
+    public String brand;
+    public void start() {
+        // Gọi từ bất kỳ đâu
+    }
+}
+</code></pre>
+          
+          <h3>🔒 private</h3>
+          <p>Chỉ truy cập <mark>trong class</mark></p>
+<pre><code>class BankAccount {
+    private double balance;
+    
+    private void validate() {
+        // Chỉ trong class này
+    }
+}
+</code></pre>
+        </div>
+        <div>
+          <h3>🛡️ protected</h3>
+          <p>Class, subclass và <mark>cùng package</mark></p>
+<pre><code>class Animal {
+    protected String species;
+    
+    protected void move() {
+        // Class con có thể dùng
+    }
+}
+</code></pre>
+          
+          <h3>📦 default</h3>
+          <p>Chỉ <mark>trong package</mark></p>
+<pre><code>class Helper {
+    String name;        // default
+    
+    void help() {       // default
+        // Chỉ trong package
+    }
+}
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. 4 trụ cột OOP -->
+    <section class="slide">
+      <h2>3. 4 trụ cột OOP</h2>
+      
+      <div class="two-columns">
+        <div>
+          <div class="callout">
+            <h3>🔒 Encapsulation (Đóng gói)</h3>
+            <p>Bảo vệ dữ liệu bằng private fields và public methods</p>
+          </div>
+          
+          <div class="callout">
+            <h3>🏗️ Inheritance (Kế thừa)</h3>
+            <p>Class con kế thừa từ class cha với từ khóa extends</p>
+          </div>
+        </div>
+        <div>
+          <div class="callout">
+            <h3>🎭 Polymorphism (Đa hình)</h3>
+            <p>Overloading và Overriding - cùng tên, khác cách làm</p>
+          </div>
+          
+          <div class="callout">
+            <h3>🎨 Abstraction (Trừu tượng)</h3>
+            <p>Ẩn chi tiết với abstract class và interface</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Ví dụ minh họa:</h3>
+<pre><code>// Encapsulation: Đóng gói
+class Student {
+    private String name;                        // private field
+    public String getName() { return name; }    // getter
+    public void setName(String n) { name = n; } // setter
+}
+
+// Inheritance: Kế thừa
+class Animal { void eat() { } }
+class Dog extends Animal { void bark() { } }
+
+// Polymorphism: Đa hình
+class Calculator {
+    int add(int a, int b) { return a + b; }         // Overloading
+    double add(double a, double b) { return a + b; } // khác kiểu tham số
+}
+
+// Abstraction: Trừu tượng
+abstract class Shape { abstract void draw(); }
+</code></pre>
+    </section>
+
+    <!-- 10. Bài tập 3: Encapsulation -->
+    <section class="slide">
+      <h2>🏋️ Bài tập 3: Encapsulation (Đóng gói)</h2>
+      <div class="callout">
+        <h3>Đề bài:</h3>
+        <p>Tạo class <code class="inline">Person</code> với private fields và getter/setter có validation.</p>
+      </div>
+
+      <div class="toggle-content">
+        <button class="toggle-btn" onclick="toggleContent(this, 'code3')">📝 Xem Code</button>
+        <button class="toggle-btn" onclick="toggleContent(this, 'result3')">🖥️ Kết Quả</button>
+        
+        <div id="code3" class="content-section">
+<pre><code>public class Person {
+    private String name;    // private = đóng gói
+    private int age;
+    private double salary;
+    
+    public Person(String name, int age) {
+        setName(name);      // Dùng setter để validation
+        setAge(age);
+        this.salary = 0.0;
+    }
+    
+    // Getter methods
+    public String getName() { return name; }
+    public int getAge() { return age; }
+    public double getSalary() { return salary; }
+    
+    // Setter methods với validation
+    public void setName(String name) {
+        if (name != null && !name.trim().isEmpty()) {
+            this.name = name.trim();
+        } else {
+            System.out.println("Tên không hợp lệ!");
+        }
+    }
+    
+    public void setAge(int age) {
+        if (age >= 0 && age <= 120) {
+            this.age = age;
+        } else {
+            System.out.println("Tuổi phải từ 0-120!");
+        }
+    }
+    
+    public void setSalary(double salary) {
+        if (salary >= 0) {
+            this.salary = salary;
+        } else {
+            System.out.println("Lương không thể âm!");
+        }
+    }
+    
+    public static void main(String[] args) {
+        Person p = new Person("An", 25);
+        p.setSalary(15000000);
+        System.out.println("Tên: " + p.getName() + ", Tuổi: " + p.getAge());
+        
+        // Test validation
+        p.setAge(-5);       // Lỗi
+        p.setAge(30);       // OK
+        System.out.println("Tuổi mới: " + p.getAge());
+    }
+}
+</code></pre>
+        </div>
+
+        <div id="result3" class="content-section">
+<pre><code>$ javac Person.java
+$ java Person
+Tên: An, Tuổi: 25
+Tuổi phải từ 0-120!
+Tuổi mới: 30
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. Inheritance -->
+    <section class="slide">
+      <h2>3.2 Inheritance (Kế thừa)</h2>
+      <p>Class con <mark>kế thừa</mark> từ class cha với từ khóa <code class="inline">extends</code>.</p>
+      
+      <div class="callout">
+        <h3>Lợi ích Inheritance:</h3>
+        <ul>
+          <li><strong>Tái sử dụng code</strong> - không viết lại</li>
+          <li><strong>Mở rộng chức năng</strong> - thêm method mới</li>
+          <li><strong>Ghi đè method</strong> - thay đổi hành vi</li>
+          <li><strong>Tổ chức code</strong> - phân cấp rõ ràng</li>
+        </ul>
+      </div>
+
+      <h3>Ví dụ Inheritance:</h3>
+<pre><code>// Class cha
+class Animal {
+    String name;
+    
+    Animal(String name) { this.name = name; }
+    
+    void eat() {
+        System.out.println(name + " đang ăn");
+    }
+}
+
+// Class con extends từ Animal
+class Dog extends Animal {
+    Dog(String name) {
+        super(name);        // Gọi constructor cha
+    }
+    
+    void bark() {           // Method riêng của Dog
+        System.out.println(name + " sủa: Woof!");
+    }
+    
+    @Override
+    void eat() {            // Ghi đè method của cha
+        System.out.println(name + " ăn thức ăn cho chó");
+    }
+}
+
+// Sử dụng
+Dog dog = new Dog("Buddy");
+dog.eat();    // Gọi method đã override
+dog.bark();   // Gọi method riêng
+</code></pre>
+    </section>
+
+    <!-- 12. Bài tập 4: Inheritance -->
+    <section class="slide">
+      <h2>🏋️ Bài tập 4: Inheritance (Kế thừa)</h2>
+      <div class="callout">
+        <h3>Đề bài:</h3>
+        <p>Tạo class <code class="inline">Vehicle</code> làm class cha, và class <code class="inline">Car</code> kế thừa từ nó.</p>
+      </div>
+
+      <div class="toggle-content">
+        <button class="toggle-btn" onclick="toggleContent(this, 'code4')">📝 Xem Code</button>
+        <button class="toggle-btn" onclick="toggleContent(this, 'result4')">🖥️ Kết Quả</button>
+        
+        <div id="code4" class="content-section">
+<pre><code>// Class cha - Vehicle
+class Vehicle {
+    protected String brand;
+    protected int speed;
+    
+    public Vehicle(String brand) {
+        this.brand = brand;
+        this.speed = 0;
+    }
+    
+    public void start() {
+        System.out.println(brand + " đang khởi động...");
+    }
+    
+    public void accelerate(int increment) {
+        speed += increment;
+        System.out.println(brand + " tăng tốc lên " + speed + " km/h");
+    }
+}
+
+// Class con - Car
+class Car extends Vehicle {
+    private boolean hasAC;
+    
+    public Car(String brand) {
+        super(brand);  // Gọi constructor của Vehicle
+        this.hasAC = true;
+    }
+    
+    @Override
+    public void start() {
+        System.out.println("Ô tô " + brand + " khởi động bằng chìa khóa");
+    }
+    
+    public void turnOnAC() {
+        if (hasAC) {
+            System.out.println("Bật điều hòa trong xe " + brand);
+        }
+    }
+}
+
+public class VehicleTest {
+    public static void main(String[] args) {
+        Car car = new Car("Toyota");
+        car.start();
+        car.accelerate(60);
+        car.turnOnAC();
+    }
+}
+</code></pre>
+        </div>
+
+        <div id="result4" class="content-section">
+<pre><code>$ javac VehicleTest.java
+$ java VehicleTest
+Ô tô Toyota khởi động bằng chìa khóa
+Toyota tăng tốc lên 60 km/h
+Bật điều hòa trong xe Toyota
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13. Polymorphism & Abstraction -->
+    <section class="slide">
+      <h2>3.3 Polymorphism & Abstraction</h2>
+      
+      <h3>🎭 Polymorphism (Đa hình)</h3>
+      <div class="two-columns">
+        <div>
+          <h4>Overloading (Compile-time)</h4>
+<pre><code>class Calculator {
+    int add(int a, int b) {
+        return a + b;
+    }
+    
+    double add(double a, double b) {
+        return a + b;
+    }
+}
+</code></pre>
+        </div>
+        <div>
+          <h4>Overriding (Runtime)</h4>
+<pre><code>class Animal {
+    void sound() { 
+        System.out.println("Some sound"); 
+    }
+}
+
+class Dog extends Animal {
+    @Override
+    void sound() { 
+        System.out.println("Woof!"); 
+    }
+}
+</code></pre>
+        </div>
+      </div>
+
+      <h3>🎨 Abstraction (Trừu tượng)</h3>
+<pre><code>abstract class Shape {
+    abstract void draw();           // Abstract method
+    
+    void display() {                // Concrete method
+        System.out.println("Displaying shape");
+    }
+}
+
+class Circle extends Shape {
+    void draw() {
+        System.out.println("Drawing Circle");
+    }
+}
+</code></pre>
+    </section>
+
+    <!-- 14. Bài tập 5: Polymorphism -->
+    <section class="slide">
+      <h2>🏋️ Bài tập 5: Polymorphism (Đa hình)</h2>
+      <div class="callout">
+        <h3>Đề bài:</h3>
+        <p>Tạo hệ thống <code class="inline">Employee</code> với các subclass khác nhau sử dụng method overriding.</p>
+      </div>
+
+      <div class="toggle-content">
+        <button class="toggle-btn" onclick="toggleContent(this, 'code5')">📝 Xem Code</button>
+        <button class="toggle-btn" onclick="toggleContent(this, 'result5')">🖥️ Kết Quả</button>
+        
+        <div id="code5" class="content-section">
+<pre><code>// Class cha
+abstract class Employee {
+    protected String name;
+    protected double baseSalary;
+    
+    public Employee(String name, double baseSalary) {
+        this.name = name;
+        this.baseSalary = baseSalary;
+    }
+    
+    // Abstract method - phải implement trong subclass
+    public abstract double calculateSalary();
+    
+    public void displayInfo() {
+        System.out.println("Tên: " + name + ", Lương: " + calculateSalary());
+    }
+}
+
+// Nhân viên toàn thời gian
+class FullTimeEmployee extends Employee {
+    private double bonus;
+    
+    public FullTimeEmployee(String name, double baseSalary, double bonus) {
+        super(name, baseSalary);
+        this.bonus = bonus;
+    }
+    
+    @Override
+    public double calculateSalary() {
+        return baseSalary + bonus;
+    }
+}
+
+// Nhân viên bán thời gian
+class PartTimeEmployee extends Employee {
+    private int hoursWorked;
+    
+    public PartTimeEmployee(String name, int hoursWorked, double hourlyRate) {
+        super(name, 0);
+        this.hoursWorked = hoursWorked;
+        this.baseSalary = hourlyRate;
+    }
+    
+    @Override
+    public double calculateSalary() {
+        return hoursWorked * baseSalary;
+    }
+}
+
+public class EmployeeTest {
+    public static void main(String[] args) {
+        Employee[] employees = {
+            new FullTimeEmployee("An", 15000000, 2000000),
+            new PartTimeEmployee("Bình", 120, 50000)
+        };
+        
+        for (Employee emp : employees) {
+            emp.displayInfo();  // Polymorphism
+        }
+    }
+}
+</code></pre>
+        </div>
+
+        <div id="result5" class="content-section">
+<pre><code>$ javac EmployeeTest.java
+$ java EmployeeTest
+Tên: An, Lương: 1.7E7
+Tên: Bình, Lương: 6000000.0
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15. Best Practices -->
+    <section class="slide">
+      <h2>4. Best Practices OOP</h2>
+      
+      <div class="two-columns">
+        <div>
+          <h3>✅ Nên làm</h3>
+          <ul>
+            <li><mark>Single Responsibility:</mark> Mỗi class chỉ làm một nhiệm vụ</li>
+            <li><mark>Encapsulation:</mark> Sử dụng private cho fields</li>
+            <li><mark>Interface:</mark> Lập trình hướng interface</li>
+            <li><mark>Naming:</mark> Đặt tên rõ ràng, có ý nghĩa</li>
+          </ul>
+        </div>
+        <div>
+          <h3>❌ Tránh</h3>
+          <ul>
+            <li>Lạm dụng inheritance quá sâu</li>
+            <li>Tạo class quá lớn (God class)</li>
+            <li>Dùng public cho tất cả fields</li>
+            <li>Không tuân thủ naming conventions</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <h3>Java Naming Conventions:</h3>
+        <ul>
+          <li><strong>Class:</strong> PascalCase (StudentManager)</li>
+          <li><strong>Method/Variable:</strong> camelCase (calculateGPA)</li>
+          <li><strong>Constant:</strong> UPPER_SNAKE_CASE (MAX_SIZE)</li>
+          <li><strong>Package:</strong> lowercase (com.company.project)</li>
+        </ul>
+      </div>
+
+<pre><code>// Ví dụ Good Practice
+public class StudentManager {
+    private static final int MAX_STUDENTS = 100;
+    private List<Student> students;
+    
+    public StudentManager() {
+        students = new ArrayList<>();
+    }
+    
+    public void addStudent(Student student) {
+        if (students.size() < MAX_STUDENTS) {
+            students.add(student);
+        }
+    }
+}
+</code></pre>
+    </section>
+
+    <!-- 16. Summary -->
+    <section class="slide">
+      <h2>📚 Tổng kết OOP</h2>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <h3>4 Trụ cột OOP trong Java</h3>
+      </div>
+      
+      <div class="two-columns">
+        <div>
+          <div class="callout">
+            <h4>🔒 Encapsulation</h4>
+            <p>Đóng gói dữ liệu với private fields và public methods</p>
+          </div>
+          
+          <div class="callout">
+            <h4>🏗️ Inheritance</h4>
+            <p>Kế thừa với từ khóa extends, tái sử dụng code</p>
+          </div>
+        </div>
+        <div>
+          <div class="callout">
+            <h4>🎭 Polymorphism</h4>
+            <p>Overloading và Overriding, một interface nhiều implementation</p>
+          </div>
+          
+          <div class="callout">
+            <h4>🎨 Abstraction</h4>
+            <p>Abstract class và interface, ẩn chi tiết implementation</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="callout" style="margin-top: 30px;">
+        <h3>🎯 Lợi ích OOP:</h3>
+        <ul>
+          <li><strong>Tái sử dụng code:</strong> Inheritance và Polymorphism</li>
+          <li><strong>Bảo trì dễ dàng:</strong> Encapsulation và Modularity</li>
+          <li><strong>Mở rộng linh hoạt:</strong> Abstract và Interface</li>
+          <li><strong>Mô phỏng thực tế:</strong> Object-oriented thinking</li>
+        </ul>
+      </div>
+      
+      <p style="text-align: center; margin-top: 30px; color: var(--muted);">
+        <strong>Buổi tiếp theo:</strong> Exception Handling và Collections
+      </p>
+    </section>
+  </div>
+
+  <div class="footer">
+    <div class="controls">
+      <button class="button" id="prevBtn" onclick="changeSlide(-1)">← Trước</button>
+      <button class="button" id="nextBtn" onclick="changeSlide(1)">Tiếp →</button>
+    </div>
+    <div class="progress">
+      <span id="progressBar"></span>
+    </div>
+    <div class="help">
+      Phím: ← → | Space | ESC
+    </div>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    function showSlide(n) {
+      slides.forEach((slide, index) => {
+        slide.classList.remove('active', 'prev');
+        if (index === n) slide.classList.add('active');
+        else if (index < n) slide.classList.add('prev');
+      });
+      
+      document.getElementById('progressBar').style.width = ((n + 1) / totalSlides * 100) + '%';
+      document.getElementById('prevBtn').disabled = n === 0;
+      document.getElementById('nextBtn').disabled = n === totalSlides - 1;
+    }
+
+    function changeSlide(direction) {
+      const newSlide = currentSlide + direction;
+      if (newSlide >= 0 && newSlide < totalSlides) {
+        currentSlide = newSlide;
+        showSlide(currentSlide);
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      switch(e.code) {
+        case 'ArrowLeft': changeSlide(-1); break;
+        case 'ArrowRight': case 'Space': changeSlide(1); e.preventDefault(); break;
+        case 'Home': currentSlide = 0; showSlide(0); break;
+        case 'End': currentSlide = totalSlides - 1; showSlide(currentSlide); break;
+        case 'Escape': if (document.fullscreenElement) document.exitFullscreen(); break;
+      }
+    });
+
+    // Toggle content function for exercise slides
+    function toggleContent(button, contentId) {
+      const content = document.getElementById(contentId);
+      const isShowing = content.classList.contains('show');
+      
+      if (isShowing) {
+        content.classList.remove('show');
+        button.innerHTML = button.innerHTML.replace('🔽 Ẩn', '📝 Xem').replace('🔽 Ẩn', '🖥️');
+      } else {
+        content.classList.add('show');
+        if (button.innerHTML.includes('Code')) {
+          button.innerHTML = '🔽 Ẩn Code';
+        } else {
+          button.innerHTML = '🔽 Ẩn Kết Quả';
+        }
+      }
+    }
+
+    showSlide(0);
+  </script>
+</body>
+</html>

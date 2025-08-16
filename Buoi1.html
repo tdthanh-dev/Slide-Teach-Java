@@ -188,7 +188,7 @@
   .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 12px; }
   .mini { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; }
   .mini p { margin: 2px 0 0; font-size: 16px; color: #cbd5e1; }
-  .num { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 999px; color: #fff; font-weight: 700; background: linear-gradient(180deg, var(--accent), var(--accent-2)); }
+  .num-badge { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 999px; color: #fff; font-weight: 700; background: linear-gradient(180deg, var(--accent), var(--accent-2)); }
 
   /* Code */
   pre, code {
@@ -452,17 +452,17 @@
             <li>Cài đặt và chọn “Set JAVA_HOME” nếu có.</li>
             <li>Thiết lập biến môi trường khi cần: <code class="inline">JAVA_HOME</code>, thêm <code class="inline">%JAVA_HOME%\bin</code> vào <code class="inline">PATH</code>.</li>
             <li>Kiểm tra phiên bản:</li>
-          </ol>
-          <pre><code>java -version
+      </ol>
+      <pre><code>java -version
 javac -version</code></pre>
-          <p class="small">Nếu xuất hiện phiên bản, môi trường đã sẵn sàng.</p>
+      <p class="small">Nếu xuất hiện phiên bản, môi trường đã sẵn sàng.</p>
         </div>
         <div>
           <div class="row" aria-label="Checklist nhanh">
-            <div class="mini"><span class="num">1</span><p><strong>Tải & cài</strong> bản 17/21 từ nhà phát hành tin cậy.</p></div>
-            <div class="mini"><span class="num">2</span><p><strong>JAVA_HOME</strong> trỏ tới thư mục cài đặt JDK.</p></div>
-            <div class="mini"><span class="num">3</span><p>Thêm thư mục <code class="inline">bin</code> của JDK vào <code class="inline">PATH</code>.</p></div>
-            <div class="mini"><span class="num">4</span><p>Chạy <code class="inline">java -version</code>, <code class="inline">javac -version</code> để xác nhận.</p></div>
+            <div class="mini"><span class="num-badge">1</span><p><strong>Tải & cài</strong> bản 17/21 từ nhà phát hành tin cậy.</p></div>
+            <div class="mini"><span class="num-badge">2</span><p><strong>JAVA_HOME</strong> trỏ tới thư mục cài đặt JDK.</p></div>
+            <div class="mini"><span class="num-badge">3</span><p>Thêm thư mục <code class="inline">bin</code> của JDK vào <code class="inline">PATH</code>.</p></div>
+            <div class="mini"><span class="num-badge">4</span><p>Chạy <code class="inline">java -version</code>, <code class="inline">javac -version</code> để xác nhận.</p></div>
           </div>
         </div>
       </div>
