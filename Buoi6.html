@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buổi 6: Java OOP - Đa hình & Trừu tượng</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --panel: #161b22;
+            --border: #21262d;
+            --text: #c9d1d9;
+            --muted: #8b949e;
+            --accent: #f97316;
+            --accent-2: #ea580c;
+            --success: #238636;
+            --warning: #d29922;
+            --error: #da3633;
+            --line: #30363d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .slides {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 30px 50px 80px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s ease-in-out;
+            background: var(--bg);
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            color: var(--accent);
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 1.4em;
+            margin: 15px 0 10px;
+            color: var(--accent-2);
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 12px;
+        }
+
+        ul,
+        ol {
+            font-size: 1.0em;
+            margin: 12px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        pre {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 12px 0;
+            overflow-x: auto;
+            font-size: 0.9em;
+            line-height: 1.3;
+            max-height: 400px;
+        }
+
+        code.inline {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: var(--panel);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        mark {
+            background: var(--accent);
+            color: var(--bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .callout {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 15px 0;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--panel);
+            border-top: 1px solid var(--border);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .button {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .button:hover {
+            background: #0f1a2b;
+        }
+
+        .button:active {
+            transform: translateY(1px);
+        }
+
+        .button[disabled] {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            height: 6px;
+            background: var(--panel);
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            overflow: hidden;
+            width: 32%;
+        }
+
+        .progress>span {
+            display: block;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            transition: width .3s ease;
+        }
+
+        .help {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 1em;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--panel);
+            font-weight: 600;
+            border-bottom: 2px solid var(--line);
+        }
+
+        td {
+            background-color: var(--panel);
+        }
+
+        .icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        /* Toggle content styles */
+        .toggle-content {
+            margin-top: 12px;
+        }
+
+        .toggle-btn {
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            margin-right: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .toggle-btn:active {
+            transform: translateY(0);
+        }
+
+        .content-section {
+            display: none;
+            margin-top: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .content-section.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .code-vs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .code-vs .code-block {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .center-image {
+            display: block;
+            margin: 20px auto;
+            max-width: 60%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        @media print {
+            body,
+            .slides,
+            .slide {
+                position: static;
+                height: auto;
+            }
+
+            .slide {
+                page-break-after: always;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+
+            .footer {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="slides" id="deck">
+        <!-- Slide 1: Giới thiệu -->
+        <section class="slide active">
+            <h1>Java OOP: Đa hình & Trừu tượng</h1>
+            <p style="text-align: center; font-size: 1.4em; color: var(--muted);">Khám phá hai trụ cột cuối cùng của Lập trình Hướng đối tượng</p>
+            <div style="text-align: center; margin-top: 30px;">
+                <p>Sau khi đã học về <strong>Đóng gói (Encapsulation)</strong> và <strong>Kế thừa (Inheritance)</strong>, hôm nay chúng ta sẽ tìm hiểu hai tính chất quan trọng còn lại của OOP:</p>
+                <div class="two-columns" style="max-width: 800px; margin: 30px auto;">
+                    <div class="callout" style="border-color: var(--success);">
+                        <h3><span class="icon">🎭</span>Đa hình (Polymorphism)</h3>
+                        <p>Một giao diện, nhiều hình thức khác nhau</p>
+                    </div>
+                    <div class="callout" style="border-color: var(--warning);">
+                        <h3><span class="icon">🎨</span>Trừu tượng (Abstraction)</h3>
+                        <p>Ẩn chi tiết, tập trung vào bản chất</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin: 30px 0;">
+                    <h3>Nội dung buổi học:</h3>
+                    <ol style="text-align: left; font-size: 1.1em; max-width: 600px; margin: 0 auto;">
+                        <li>Đa hình: Method Overloading & Overriding</li>
+                        <li>Dynamic Method Dispatch</li>
+                        <li>Trừu tượng: Abstract Classes & Interfaces</li>
+                        <li>So sánh Abstract Class vs Interface</li>
+                        <li>Bài tập thực hành</li>
+                    </ol>
+                </div>
+                <p style="color: var(--muted); margin-top: 30px;">Sử dụng phím ← → để điều hướng</p>
+            </div>
+        </section>
+
+        <!-- Slide 2: Khái niệm Đa hình -->
+        <section class="slide">
+            <h2>1. Khái niệm Đa hình (Polymorphism)</h2>
+            <p><strong>Định nghĩa:</strong> Đa hình có nghĩa là <mark>"một giao diện, nhiều hình thức"</mark>. Nó cho phép các đối tượng khác nhau phản ứng khác nhau với cùng một thao tác.</p>
+            <div class="callout">
+                <h3>🔍 Ví dụ trong thực tế:</h3>
+                <p>Khi bạn nhấn nút "Play" trên remote TV:</p>
+                <ul>
+                    <li>📺 TV sẽ phát chương trình</li>
+                    <li>📀 DVD player sẽ phát đĩa</li>
+                    <li>📱 Smartphone sẽ phát nhạc</li>
+                </ul>
+                <p>Cùng một thao tác "Play" nhưng mỗi thiết bị phản ứng khác nhau!</p>
+            </div>
+            <div class="two-columns">
+                <div>
+                    <h3>Hai loại Đa hình trong Java:</h3>
+                    <ul>
+                        <li><strong>🔄 Compile-time Polymorphism:</strong>
+                            <ul>
+                                <li>Method Overloading</li>
+                                <li>Constructor Overloading</li>
+                            </ul>
+                        </li>
+                        <li><strong>⚡ Runtime Polymorphism:</strong>
+                            <ul>
+                                <li>Method Overriding</li>
+                                <li>Dynamic Method Dispatch</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Lợi ích của Đa hình:</h3>
+                    <ul>
+                        <li><span class="icon">🔧</span><strong>Linh hoạt:</strong> Dễ dàng mở rộng và thay đổi hành vi</li>
+                        <li><span class="icon">♻️</span><strong>Tái sử dụng:</strong> Một giao diện cho nhiều implementation</li>
+                        <li><span class="icon">📝</span><strong>Code sạch:</strong> Giảm thiểu if-else phức tạp</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Method Overloading -->
+        <section class="slide">
+            <h2>2. Method Overloading (Nạp chồng phương thức)</h2>
+            <p><strong>Định nghĩa:</strong> Là việc <mark>định nghĩa nhiều phương thức có cùng tên nhưng khác tham số</mark> trong cùng một class.</p>
+            <div class="callout">
+                <h3>Điều kiện để Overloading:</h3>
+                <ul>
+                    <li>✅ Cùng tên phương thức</li>
+                    <li>✅ Khác số lượng tham số HOẶC khác kiểu tham số</li>
+                    <li>❌ Chỉ khác kiểu trả về thì KHÔNG được</li>
+                </ul>
+            </div>
+            <h3>Ví dụ Method Overloading:</h3>
+            <pre><code>public class Calculator {
+    // Overloading với số lượng tham số khác nhau
+    public int add(int a, int b) {
+        return a + b;
+    }
+    
+    public int add(int a, int b, int c) {
+        return a + b + c;
+    }
+    
+    // Overloading với kiểu tham số khác nhau
+    public double add(double a, double b) {
+        return a + b;
+    }
+    
+    public String add(String a, String b) {
+        return a + " " + b;
+    }
+    
+    public static void main(String[] args) {
+        Calculator calc = new Calculator();
+        
+        System.out.println(calc.add(5, 3));           // 8
+        System.out.println(calc.add(5, 3, 2));       // 10
+        System.out.println(calc.add(5.5, 3.2));      // 8.7
+        System.out.println(calc.add("Hello", "Java")); // Hello Java
+    }
+}</code></pre>
+            <p>Java sẽ tự động chọn phương thức phù hợp dựa trên tham số truyền vào!</p>
+        </section>
+
+        <!-- Slide 4: Bài tập Method Overloading -->
+        <section class="slide">
+            <h2>🏋️ Bài tập 1: Method Overloading</h2>
+            <div class="callout">
+                <h3>Đề bài:</h3>
+                <p>Tạo class <code class="inline">Printer</code> với các phương thức <code class="inline">print()</code> overloading để in ra:</p>
+                <ol>
+                    <li>Một số nguyên</li>
+                    <li>Một chuỗi</li>
+                    <li>Một mảng số nguyên</li>
+                    <li>Một số nguyên n lần</li>
+                </ol>
+            </div>
+
+            <div class="toggle-content">
+                <button class="toggle-btn" onclick="toggleContent(this, 'code1')">📝 Xem Code</button>
+                <button class="toggle-btn" onclick="toggleContent(this, 'result1')">🖥️ Kết Quả</button>
+
+                <div id="code1" class="content-section">
+                    <pre><code>public class Printer {
+    // In một số nguyên
+    public void print(int number) {
+        System.out.println("Integer: " + number);
+    }
+    
+    // In một chuỗi
+    public void print(String text) {
+        System.out.println("String: " + text);
+    }
+    
+    // In một mảng số nguyên
+    public void print(int[] array) {
+        System.out.print("Array: [");
+        for (int i = 0; i < array.length; i++) {
+            System.out.print(array[i]);
+            if (i < array.length - 1) {
+                System.out.print(", ");
+            }
+        }
+        System.out.println("]");
+    }
+    
+    // In một số nguyên n lần
+    public void print(int number, int times) {
+        System.out.print("Repeat " + times + " times: ");
+        for (int i = 0; i < times; i++) {
+            System.out.print(number + " ");
+        }
+        System.out.println();
+    }
+    
+    public static void main(String[] args) {
+        Printer printer = new Printer();
+        
+        printer.print(42);                    // In số nguyên
+        printer.print("Hello Java!");         // In chuỗi
+        printer.print(new int[]{1, 2, 3, 4}); // In mảng
+        printer.print(7, 3);                  // In số 7 ba lần
+    }
+}</code></pre>
+                </div>
+
+                <div id="result1" class="content-section">
+                    <pre><code>$ javac Printer.java
+$ java Printer
+Integer: 42
+String: Hello Java!
+Array: [1, 2, 3, 4]
+Repeat 3 times: 7 7 7 </code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Method Overriding -->
+        <section class="slide">
+            <h2>3. Method Overriding (Ghi đè phương thức)</h2>
+            <p><strong>Định nghĩa:</strong> Là việc <mark>lớp con định nghĩa lại phương thức đã có ở lớp cha</mark> với cùng tên, tham số nhưng cài đặt khác.</p>
+            <div class="callout">
+                <h3>Điều kiện để Overriding:</h3>
+                <ul>
+                    <li>✅ Phải có quan hệ kế thừa (IS-A)</li>
+                    <li>✅ Cùng tên, cùng tham số như lớp cha</li>
+                    <li>✅ Quyền truy cập không được hẹp hơn lớp cha</li>
+                    <li>✅ Nên dùng annotation <code class="inline">@Override</code></li>
+                </ul>
+            </div>
+            <h3>Ví dụ Method Overriding:</h3>
+            <pre><code>// Lớp cha
+abstract class Animal {
+    public void eat() {
+        System.out.println("Animal is eating...");
+    }
+    
+    public abstract void makeSound(); // Abstract method - bắt buộc override
+}
+
+// Lớp con 1
+class Dog extends Animal {
+    @Override
+    public void eat() {
+        System.out.println("Dog is eating dog food");
+    }
+    
+    @Override
+    public void makeSound() {
+        System.out.println("Woof woof!");
+    }
+}
+
+// Lớp con 2
+class Cat extends Animal {
+    @Override
+    public void eat() {
+        System.out.println("Cat is eating fish");
+    }
+    
+    @Override
+    public void makeSound() {
+        System.out.println("Meow meow!");
+    }
+}</code></pre>
+        </section>
+
+        <!-- Slide 6: Dynamic Method Dispatch -->
+        <section class="slide">
+            <h2>4. Dynamic Method Dispatch</h2>
+            <p><strong>Định nghĩa:</strong> Là cơ chế <mark>Java quyết định gọi phương thức nào trong runtime</mark> dựa trên kiểu thực tế của đối tượng, không phải kiểu tham chiếu.</p>
+            <div class="callout">
+                <p><strong>💡 Điều kỳ diệu:</strong> Java sẽ tự động gọi đúng phương thức của lớp con ngay cả khi bạn dùng tham chiếu lớp cha!</p>
+            </div>
+            <h3>Ví dụ Dynamic Method Dispatch:</h3>
+            <pre><code>public class PolymorphismDemo {
+    public static void main(String[] args) {
+        // Tham chiếu lớp cha, nhưng đối tượng thực tế là lớp con
+        Animal myPet1 = new Dog();  
+        Animal myPet2 = new Cat();  
+        
+        // Runtime sẽ gọi đúng phương thức của từng lớp con
+        myPet1.eat();        // "Dog is eating dog food"
+        myPet1.makeSound();  // "Woof woof!"
+        
+        myPet2.eat();        // "Cat is eating fish"  
+        myPet2.makeSound();  // "Meow meow!"
+        
+        // Ví dụ với mảng đa hình
+        Animal[] pets = {new Dog(), new Cat(), new Dog()};
+        
+        System.out.println("\nAll pets making sound:");
+        for (Animal pet : pets) {
+            pet.makeSound(); // Mỗi con vật sẽ kêu theo cách riêng!
+        }
+    }
+}</code></pre>
+            <div class="callout">
+                <p><strong>🎯 Kết quả:</strong> Mặc dù dùng tham chiếu <code class="inline">Animal</code>, nhưng Java vẫn gọi đúng phương thức của <code class="inline">Dog</code> và <code class="inline">Cat</code>!</p>
+            </div>
+        </section>
+
+        <!-- Slide 7: Bài tập Polymorphism -->
+        <section class="slide">
+            <h2>🏋️ Bài tập 2: Runtime Polymorphism</h2>
+            <div class="callout">
+                <h3>Đề bài:</h3>
+                <p>Tạo hệ thống quản lý hình học với lớp cha <code class="inline">Shape</code> và các lớp con <code class="inline">Circle</code>, <code class="inline">Rectangle</code>. Sử dụng polymorphism để tính diện tích các hình.</p>
+            </div>
+
+            <div class="toggle-content">
+                <button class="toggle-btn" onclick="toggleContent(this, 'code2')">📝 Xem Code</button>
+                <button class="toggle-btn" onclick="toggleContent(this, 'result2')">🖥️ Kết Quả</button>
+
+                <div id="code2" class="content-section">
+                    <pre><code>// Lớp cha trừu tượng
+abstract class Shape {
+    protected String name;
+    
+    public Shape(String name) {
+        this.name = name;
+    }
+    
+    // Phương thức trừu tượng - bắt buộc các lớp con phải implement
+    public abstract double calculateArea();
+    
+    public void displayInfo() {
+        System.out.println(name + " có diện tích: " + calculateArea());
+    }
+}
+
+// Lớp con Circle
+class Circle extends Shape {
+    private double radius;
+    
+    public Circle(double radius) {
+        super("Hình tròn");
+        this.radius = radius;
+    }
+    
+    @Override
+    public double calculateArea() {
+        return Math.PI * radius * radius;
+    }
+}
+
+// Lớp con Rectangle
+class Rectangle extends Shape {
+    private double width, height;
+    
+    public Rectangle(double width, double height) {
+        super("Hình chữ nhật");
+        this.width = width;
+        this.height = height;
+    }
+    
+    @Override
+    public double calculateArea() {
+        return width * height;
+    }
+}
+
+public class ShapeDemo {
+    public static void main(String[] args) {
+        // Polymorphism - dùng tham chiếu lớp cha
+        Shape[] shapes = {
+            new Circle(5),
+            new Rectangle(4, 6),
+            new Circle(3),
+            new Rectangle(2, 8)
+        };
+        
+        System.out.println("=== THÔNG TIN CÁC HÌNH ===");
+        for (Shape shape : shapes) {
+            shape.displayInfo(); // Polymorphism in action!
+        }
+        
+        // Tính tổng diện tích
+        double totalArea = 0;
+        for (Shape shape : shapes) {
+            totalArea += shape.calculateArea();
+        }
+        
+        System.out.printf("\nTổng diện tích tất cả hình: %.2f\n", totalArea);
+    }
+}</code></pre>
+                </div>
+
+                <div id="result2" class="content-section">
+                    <pre><code>$ javac ShapeDemo.java
+$ java ShapeDemo
+=== THÔNG TIN CÁC HÌNH ===
+Hình tròn có diện tích: 78.53981633974483
+Hình chữ nhật có diện tích: 24.0
+Hình tròn có diện tích: 28.274333882308138
+Hình chữ nhật có diện tích: 16.0
+
+Tổng diện tích tất cả hình: 146.81</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Khái niệm Trừu tượng -->
+        <section class="slide">
+            <h2>5. Khái niệm Trừu tượng (Abstraction)</h2>
+            <p><strong>Định nghĩa:</strong> Trừu tượng là quá trình <mark>ẩn đi các chi tiết cài đặt phức tạp</mark> và chỉ hiển thị những tính năng cần thiết cho người dùng.</p>
+            <div class="callout">
+                <h3>🚗 Ví dụ thực tế:</h3>
+                <p>Khi bạn lái xe, bạn chỉ cần biết:</p>
+                <ul>
+                    <li>✅ Cách đạp ga, thắng, vặn tay lái</li>
+                    <li>❌ KHÔNG cần biết động cơ hoạt động như thế nào</li>
+                    <li>❌ KHÔNG cần biết hệ thống phanh hoạt động ra sao</li>
+                </ul>
+                <p><strong>➡️ Abstraction giúp đơn giản hóa việc sử dụng!</strong></p>
+            </div>
+            <div class="two-columns">
+                <div>
+                    <h3>Hai cách thực hiện Abstraction:</h3>
+                    <ul>
+                        <li><strong>🎨 Abstract Class:</strong>
+                            <ul>
+                                <li>Có từ khóa <code class="inline">abstract</code></li>
+                                <li>Có thể chứa abstract method và concrete method</li>
+                                <li>Không thể tạo đối tượng trực tiếp</li>
+                            </ul>
+                        </li>
+                        <li><strong>📝 Interface:</strong>
+                            <ul>
+                                <li>Tất cả method đều abstract (Java 7 trở xuống)</li>
+                                <li>Hỗ trợ đa kế thừa (implements nhiều interface)</li>
+                                <li>Như một "hợp đồng" về hành vi</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Lợi ích của Abstraction:</h3>
+                    <ul>
+                        <li><span class="icon">🎯</span><strong>Focus:</strong> Tập trung vào WHAT thay vì HOW</li>
+                        <li><span class="icon">🔒</span><strong>Security:</strong> Ẩn logic phức tạp</li>
+                        <li><span class="icon">🔧</span><strong>Maintainability:</strong> Dễ thay đổi implementation</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Abstract Class -->
+        <section class="slide">
+            <h2>6. Abstract Class (Lớp trừu tượng)</h2>
+            <p><strong>Đặc điểm:</strong> Abstract class là lớp <mark>không thể tạo đối tượng trực tiếp</mark>, thường chứa cả abstract method và concrete method.</p>
+            <div class="callout">
+                <h3>Quy tắc Abstract Class:</h3>
+                <ul>
+                    <li>🚫 Không thể khởi tạo đối tượng: <code class="inline">new AbstractClass()</code> ❌</li>
+                    <li>✅ Có thể chứa constructor (để lớp con gọi)</li>
+                    <li>✅ Có thể chứa field, concrete method và abstract method</li>
+                    <li>✅ Lớp con phải implement tất cả abstract method</li>
+                </ul>
+            </div>
+            <h3>Ví dụ Abstract Class:</h3>
+            <pre><code>// Abstract class
+abstract class Vehicle {
+    protected String brand;
+    protected int speed;
+    
+    // Constructor
+    public Vehicle(String brand) {
+        this.brand = brand;
+        this.speed = 0;
+    }
+    
+    // Concrete method (có implementation)
+    public void start() {
+        System.out.println(brand + " đang khởi động...");
+        this.speed = 10;
+    }
+    
+    // Abstract method (không có implementation)
+    public abstract void accelerate();
+    public abstract void brake();
+}
+
+// Lớp con phải implement tất cả abstract method
+class Car extends Vehicle {
+    public Car(String brand) {
+        super(brand);
+    }
+    
+    @Override
+    public void accelerate() {
+        speed += 20;
+        System.out.println("Xe " + brand + " tăng tốc lên " + speed + " km/h");
+    }
+    
+    @Override
+    public void brake() {
+        speed = Math.max(0, speed - 30);
+        System.out.println("Xe " + brand + " giảm tốc xuống " + speed + " km/h");
+    }
+}</code></pre>
+        </section>
+
+        <!-- Slide 10: Interface -->
+        <section class="slide">
+            <h2>7. Interface (Giao diện)</h2>
+            <p><strong>Định nghĩa:</strong> Interface là một <mark>"hợp đồng" định nghĩa những gì một class có thể làm</mark>, nhưng không quy định cách làm.</p>
+            <div class="callout">
+                <h3>Đặc điểm Interface:</h3>
+                <ul>
+                    <li>🔒 Tất cả method đều <code class="inline">public abstract</code> (mặc định)</li>
+                    <li>🔒 Tất cả field đều <code class="inline">public static final</code> (constants)</li>
+                    <li>✅ Một class có thể implements nhiều interface</li>
+                    <li>✅ Interface có thể extends interface khác</li>
+                    <li>🚫 Không có constructor</li>
+                </ul>
+            </div>
+            <h3>Ví dụ Interface:</h3>
+            <pre><code>// Interface định nghĩa hành vi
+interface Flyable {
+    int MAX_ALTITUDE = 10000; // public static final (constant)
+    
+    void fly();    // public abstract method
+    void land();   // public abstract method
+}
+
+interface Swimmable {
+    void swim();
+    void dive();
+}
+
+// Class có thể implements nhiều interface
+class Duck implements Flyable, Swimmable {
+    private String name;
+    
+    public Duck(String name) {
+        this.name = name;
+    }
+    
+    @Override
+    public void fly() {
+        System.out.println(name + " đang bay trên không");
+    }
+    
+    @Override
+    public void land() {
+        System.out.println(name + " đã hạ cánh");
+    }
+    
+    @Override
+    public void swim() {
+        System.out.println(name + " đang bơi trên mặt nước");
+    }
+    
+    @Override
+    public void dive() {
+        System.out.println(name + " đang lặn dưới nước");
+    }
+}</code></pre>
+        </section>
+
+        <!-- Slide 11: So sánh Abstract Class vs Interface -->
+        <section class="slide">
+            <h2>8. So sánh Abstract Class vs Interface</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tiêu chí</th>
+                        <th>🎨 Abstract Class</th>
+                        <th>📝 Interface</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Từ khóa</strong></td>
+                        <td><code class="inline">abstract class</code></td>
+                        <td><code class="inline">interface</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kế thừa</strong></td>
+                        <td>Chỉ extends 1 class</td>
+                        <td>Implements nhiều interface</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Method</strong></td>
+                        <td>Abstract + Concrete method</td>
+                        <td>Chỉ abstract method (Java 7)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Field</strong></td>
+                        <td>Mọi loại field</td>
+                        <td>Chỉ public static final</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Constructor</strong></td>
+                        <td>Có thể có</td>
+                        <td>Không có</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Access Modifier</strong></td>
+                        <td>public, protected, private</td>
+                        <td>Chỉ public</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mục đích</strong></td>
+                        <td>Code reuse, IS-A relationship</td>
+                        <td>Contract, CAN-DO behavior</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="callout">
+                <h3>💡 Khi nào dùng cái gì?</h3>
+                <div class="two-columns">
+                    <div>
+                        <h4>Dùng Abstract Class khi:</h4>
+                        <ul>
+                            <li>Có quan hệ "IS-A" rõ ràng</li>
+                            <li>Muốn share code giữa các lớp con</li>
+                            <li>Cần field non-constant</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Dùng Interface khi:</h4>
+                        <ul>
+                            <li>Định nghĩa "contract" về hành vi</li>
+                            <li>Muốn multiple inheritance</li>
+                            <li>Quan hệ "CAN-DO" thay vì "IS-A"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: Bài tập Interface -->
+        <section class="slide">
+            <h2>🏋️ Bài tập 3: Interface & Abstract Class</h2>
+            <div class="callout">
+                <h3>Đề bài:</h3>
+                <p>Tạo hệ thống quản lý nhân viên với:</p>
+                <ol>
+                    <li>Interface <code class="inline">Workable</code> với method <code class="inline">work()</code> và <code class="inline">takeBreak()</code></li>
+                    <li>Abstract class <code class="inline">Employee</code> với thông tin cơ bản và abstract method <code class="inline">calculateSalary()</code></li>
+                    <li>Class <code class="inline">Developer</code> và <code class="inline">Manager</code> kế thừa từ <code class="inline">Employee</code> và implements <code class="inline">Workable</code></li>
+                </ol>
+            </div>
+
+            <div class="toggle-content">
+                <button class="toggle-btn" onclick="toggleContent(this, 'code3')">📝 Xem Code</button>
+                <button class="toggle-btn" onclick="toggleContent(this, 'result3')">🖥️ Kết Quả</button>
+
+                <div id="code3" class="content-section">
+                    <pre><code>// Interface định nghĩa hành vi làm việc
+interface Workable {
+    void work();
+    void takeBreak();
+}
+
+// Abstract class cho nhân viên
+abstract class Employee {
+    protected String name;
+    protected double baseSalary;
+    
+    public Employee(String name, double baseSalary) {
+        this.name = name;
+        this.baseSalary = baseSalary;
+    }
+    
+    // Concrete method
+    public void displayInfo() {
+        System.out.println("Nhân viên: " + name);
+        System.out.println("Lương cơ bản: $" + baseSalary);
+        System.out.println("Lương thực nhận: $" + calculateSalary());
+        System.out.println("---");
+    }
+    
+    // Abstract method - bắt buộc phải implement
+    public abstract double calculateSalary();
+}
+
+// Lớp Developer
+class Developer extends Employee implements Workable {
+    private int overtimeHours;
+    
+    public Developer(String name, double baseSalary, int overtimeHours) {
+        super(name, baseSalary);
+        this.overtimeHours = overtimeHours;
+    }
+    
+    @Override
+    public double calculateSalary() {
+        return baseSalary + (overtimeHours * 50); // $50/h overtime
+    }
+    
+    @Override
+    public void work() {
+        System.out.println(name + " đang code và debug...");
+    }
+    
+    @Override
+    public void takeBreak() {
+        System.out.println(name + " nghỉ giải lao, uống cà phê");
+    }
+}
+
+// Lớp Manager  
+class Manager extends Employee implements Workable {
+    private int teamSize;
+    
+    public Manager(String name, double baseSalary, int teamSize) {
+        super(name, baseSalary);
+        this.teamSize = teamSize;
+    }
+    
+    @Override
+    public double calculateSalary() {
+        return baseSalary + (teamSize * 200); // $200 per team member
+    }
+    
+    @Override
+    public void work() {
+        System.out.println(name + " đang quản lý team và họp hành...");
+    }
+    
+    @Override
+    public void takeBreak() {
+        System.out.println(name + " nghỉ giải lao, kiểm tra email");
+    }
+}
+
+public class CompanyDemo {
+    public static void main(String[] args) {
+        // Polymorphism với abstract class
+        Employee[] employees = {
+            new Developer("Alice", 5000, 10),
+            new Manager("Bob", 8000, 5),
+            new Developer("Charlie", 4500, 15)
+        };
+        
+        System.out.println("=== THÔNG TIN NHÂN VIÊN ===");
+        for (Employee emp : employees) {
+            emp.displayInfo();
+        }
+        
+        System.out.println("=== HOẠT ĐỘNG TRONG NGÀY ===");
+        for (Employee emp : employees) {
+            // Cast về Workable để gọi work() và takeBreak()
+            if (emp instanceof Workable) {
+                Workable worker = (Workable) emp;
+                worker.work();
+                worker.takeBreak();
+                System.out.println();
+            }
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div id="result3" class="content-section">
+                    <pre><code>$ javac CompanyDemo.java
+$ java CompanyDemo
+=== THÔNG TIN NHÂN VIÊN ===
+Nhân viên: Alice
+Lương cơ bản: $5000.0
+Lương thực nhận: $5500.0
+---
+Nhân viên: Bob
+Lương cơ bản: $8000.0
+Lương thực nhận: $9000.0
+---
+Nhân viên: Charlie
+Lương cơ bản: $4500.0
+Lương thực nhận: $5250.0
+---
+=== HOẠT ĐỘNG TRONG NGÀY ===
+Alice đang code và debug...
+Alice nghỉ giải lao, uống cà phê
+
+Bob đang quản lý team và họp hành...
+Bob nghỉ giải lao, kiểm tra email
+
+Charlie đang code và debug...
+Charlie nghỉ giải lao, uống cà phê</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13: Default và Static Methods trong Interface -->
+        <section class="slide">
+            <h2>9. Default và Static Methods (Java 8+)</h2>
+            <p>Từ Java 8, Interface đã có thêm tính năng mới:</p>
+            <div class="two-columns">
+                <div>
+                    <h3>🔧 Default Method</h3>
+                    <ul>
+                        <li>Có implementation trong interface</li>
+                        <li>Lớp con có thể dùng hoặc override</li>
+                        <li>Giải quyết vấn đề backward compatibility</li>
+                    </ul>
+                    <pre><code>interface Calculator {
+    // Abstract method (phải implement)
+    double calculate(double a, double b);
+    
+    // Default method (có thể dùng luôn)
+    default void printResult(double result) {
+        System.out.println("Kết quả: " + result);
+    }
+}</code></pre>
+                </div>
+                <div>
+                    <h3>⚡ Static Method</h3>
+                    <ul>
+                        <li>Gọi trực tiếp qua tên interface</li>
+                        <li>Không thể override</li>
+                        <li>Tiện cho utility methods</li>
+                    </ul>
+                    <pre><code>interface MathUtils {
+    // Static method
+    static double pi() {
+        return 3.14159;
+    }
+    
+    static double square(double x) {
+        return x * x;
+    }
+}
+
+// Sử dụng:
+double area = MathUtils.pi() * 
+              MathUtils.square(radius);</code></pre>
+                </div>
+            </div>
+            <div class="callout">
+                <p><strong>💡 Lưu ý:</strong> Default và static method giúp interface linh hoạt hơn, nhưng vẫn giữ được tính chất "contract" cơ bản của interface.</p>
+            </div>
+        </section>
+
+        <!-- Slide 14: Best Practices -->
+        <section class="slide">
+            <h2>10. Best Practices: Đa hình & Trừu tượng</h2>
+            <div class="two-columns">
+                <div>
+                    <h3>✅ Nên làm</h3>
+                    <ul>
+                        <li><strong>🎯 Lập trình hướng Interface:</strong> Dùng interface type thay vì concrete class</li>
+                        <li><strong>📝 Sử dụng @Override:</strong> Luôn dùng annotation này khi override</li>
+                        <li><strong>🏗️ Composition over Inheritance:</strong> Ưu tiên composition khi không có IS-A</li>
+                        <li><strong>📋 Định nghĩa contract rõ ràng:</strong> Interface phải có ý nghĩa rõ ràng</li>
+                        <li><strong>🔄 SOLID principles:</strong> Đặc biệt là Liskov Substitution</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>❌ Tránh</h3>
+                    <ul>
+                        <li>Overload quá nhiều, gây nhầm lẫn</li>
+                        <li>Fat interface (quá nhiều method)</li>
+                        <li>Lạm dụng inheritance sâu</li>
+                        <li>Thiết kế abstract class không cần thiết</li>
+                        <li>Override method mà không gọi super khi cần</li>
+                    </ul>
+                </div>
+            </div>
+            <h3>💡 Nguyên tắc thiết kế tốt:</h3>
+            <div class="callout">
+                <pre><code>// ✅ Good: Lập trình hướng interface
+List<String> names = new ArrayList<>();  // Dùng interface type
+Map<String, Integer> scores = new HashMap<>();
+
+// ✅ Good: Method overloading có ý nghĩa
+public void draw(Circle circle) { ... }
+public void draw(Rectangle rectangle) { ... }
+public void draw(Shape[] shapes) { ... }
+
+// ❌ Bad: Concrete class type
+ArrayList<String> names = new ArrayList<>();  // Cứng nhắc
+HashMap<String, Integer> scores = new HashMap<>();
+
+// ❌ Bad: Overloading không rõ nghĩa
+public void process(String data) { ... }
+public void process(String info) { ... }  // Tham số giống nhau!</code></pre>
+            </div>
+        </section>
+
+        <!-- Slide 15: Real-world Example -->
+        <section class="slide">
+            <h2>11. Ví dụ thực tế: Payment System</h2>
+            <p>Hãy xem cách Đa hình và Trừu tượng được sử dụng trong một hệ thống thanh toán thực tế:</p>
+            <div class="toggle-content">
+                <button class="toggle-btn" onclick="toggleContent(this, 'payment-code')">📝 Xem Code</button>
+                <button class="toggle-btn" onclick="toggleContent(this, 'payment-result')">🖥️ Demo</button>
+
+                <div id="payment-code" class="content-section">
+                    <pre><code>// Interface cho payment method
+interface PaymentMethod {
+    boolean processPayment(double amount);
+    String getPaymentType();
+    
+    // Default method (Java 8+)
+    default void printReceipt(double amount) {
+        System.out.println("=== HÓA ĐƠN THANH TOÁN ===");
+        System.out.println("Phương thức: " + getPaymentType());
+        System.out.println("Số tiền: $" + amount);
+        System.out.println("Trạng thái: Thành công");
+        System.out.println("========================");
+    }
+}
+
+// Abstract class cho credit card
+abstract class CreditCard implements PaymentMethod {
+    protected String cardNumber;
+    protected String holderName;
+    
+    public CreditCard(String cardNumber, String holderName) {
+        this.cardNumber = maskCardNumber(cardNumber);
+        this.holderName = holderName;
+    }
+    
+    private String maskCardNumber(String cardNumber) {
+        return "**** **** **** " + cardNumber.substring(cardNumber.length() - 4);
+    }
+    
+    // Template method
+    public boolean processPayment(double amount) {
+        if (validateCard() && checkBalance(amount)) {
+            deductAmount(amount);
+            return true;
+        }
+        return false;
+    }
+    
+    protected abstract boolean validateCard();
+    protected abstract boolean checkBalance(double amount);
+    protected abstract void deductAmount(double amount);
+}
+
+// Concrete implementations
+class VisaCard extends CreditCard {
+    public VisaCard(String cardNumber, String holderName) {
+        super(cardNumber, holderName);
+    }
+    
+    @Override
+    public String getPaymentType() { return "Visa Card"; }
+    
+    @Override
+    protected boolean validateCard() {
+        System.out.println("Validating Visa card...");
+        return true; // Simulation
+    }
+    
+    @Override
+    protected boolean checkBalance(double amount) {
+        System.out.println("Checking Visa balance...");
+        return true; // Simulation
+    }
+    
+    @Override
+    protected void deductAmount(double amount) {
+        System.out.println("Deducting $" + amount + " from Visa");
+    }
+}
+
+class PayPal implements PaymentMethod {
+    private String email;
+    
+    public PayPal(String email) { this.email = email; }
+    
+    @Override
+    public String getPaymentType() { return "PayPal"; }
+    
+    @Override
+    public boolean processPayment(double amount) {
+        System.out.println("Processing PayPal payment for " + email);
+        System.out.println("Deducting $" + amount + " from PayPal balance");
+        return true;
+    }
+}
+
+// Payment processor sử dụng polymorphism
+class PaymentProcessor {
+    public void processOrder(PaymentMethod paymentMethod, double amount) {
+        System.out.println("Đang xử lý đơn hàng với " + paymentMethod.getPaymentType());
+        
+        if (paymentMethod.processPayment(amount)) {
+            paymentMethod.printReceipt(amount);
+            System.out.println("✅ Thanh toán thành công!\n");
+        } else {
+            System.out.println("❌ Thanh toán thất bại!\n");
+        }
+    }
+}
+
+public class PaymentSystemDemo {
+    public static void main(String[] args) {
+        PaymentProcessor processor = new PaymentProcessor();
+        
+        // Polymorphism - different payment methods
+        PaymentMethod[] payments = {
+            new VisaCard("1234567890123456", "John Doe"),
+            new PayPal("john@example.com"),
+            new VisaCard("9876543210987654", "Jane Smith")
+        };
+        
+        double[] amounts = {99.99, 149.50, 299.00};
+        
+        for (int i = 0; i < payments.length; i++) {
+            processor.processOrder(payments[i], amounts[i]);
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div id="payment-result" class="content-section">
+                    <pre><code>$ javac PaymentSystemDemo.java
+$ java PaymentSystemDemo
+Đang xử lý đơn hàng với Visa Card
+Validating Visa card...
+Checking Visa balance...
+Deducting $99.99 from Visa
+=== HÓA ĐƠN THANH TOÁN ===
+Phương thức: Visa Card
+Số tiền: $99.99
+Trạng thái: Thành công
+========================
+✅ Thanh toán thành công!
+
+Đang xử lý đơn hàng với PayPal
+Processing PayPal payment for john@example.com
+Deducting $149.5 from PayPal balance
+=== HÓA ĐƠN THANH TOÁN ===
+Phương thức: PayPal
+Số tiền: $149.5
+Trạng thái: Thành công
+========================
+✅ Thanh toán thành công!
+
+Đang xử lý đơn hàng với Visa Card
+Validating Visa card...
+Checking Visa balance...
+Deducting $299.0 from Visa
+=== HÓA ĐƠN THANH TOÁN ===
+Phương thức: Visa Card
+Số tiền: $299.0
+Trạng thái: Thành công
+========================
+✅ Thanh toán thành công!</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 16: Tổng kết -->
+        <section class="slide">
+            <h2>12. 📚 Tổng kết</h2>
+            <div style="text-align: center; margin: 30px 0;">
+                <h3>4 Trụ cột OOP hoàn chỉnh</h3>
+            </div>
+
+            <div class="two-columns">
+                <div>
+                    <div class="callout" style="border-color: var(--success);">
+                        <h4>🔒 Encapsulation</h4>
+                        <p>Đóng gói dữ liệu và hành vi</p>
+                    </div>
+
+                    <div class="callout" style="border-color: var(--warning);">
+                        <h4>🏗️ Inheritance</h4>
+                        <p>Kế thừa và tái sử dụng code</p>
+                    </div>
+                </div>
+                <div>
+                    <div class="callout" style="border-color: var(--accent);">
+                        <h4>🎭 Polymorphism</h4>
+                        <p>Một giao diện, nhiều hình thức</p>
+                    </div>
+
+                    <div class="callout" style="border-color: var(--error);">
+                        <h4>🎨 Abstraction</h4>
+                        <p>Ẩn chi tiết, hiển thị bản chất</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <h3>🎯 Những điều quan trọng cần nhớ:</h3>
+                <ul style="font-size: 1.1em;">
+                    <li><strong>Polymorphism:</strong> Method Overloading (compile-time) và Method Overriding (runtime)</li>
+                    <li><strong>Dynamic Method Dispatch:</strong> Java tự động gọi đúng method dựa trên object type</li>
+                    <li><strong>Abstract Class:</strong> Dùng khi có IS-A relationship và muốn share code</li>
+                    <li><strong>Interface:</strong> Dùng để định nghĩa contract và support multiple inheritance</li>
+                    <li><strong>Best Practice:</strong> "Program to interface, not implementation"</li>
+                </ul>
+            </div>
+
+            <div class="callout" style="margin-top: 30px;">
+                <h3>🚀 Bước tiếp theo:</h3>
+                <p>Với 4 trụ cột OOP đã hoàn thiện, bạn đã sẵn sàng để:</p>
+                <ul>
+                    <li>Thiết kế và xây dựng các ứng dụng Java phức tạp</li>
+                    <li>Học các Design Patterns (Singleton, Factory, Observer...)</li>
+                    <li>Tìm hiểu về Collections Framework và Exception Handling</li>
+                    <li>Khám phá Java 8+ features (Lambda, Stream API...)</li>
+                </ul>
+            </div>
+
+            <p style="text-align: center; margin-top: 30px; color: var(--muted);">
+                <strong>🎉 Chúc mừng! Bạn đã hoàn thành khóa học Java OOP cơ bản! 🎉</strong>
+            </p>
+        </section>
+    </div>
+
+    <div class="footer">
+        <div class="controls">
+            <button id="prev" class="button">← Trước</button>
+            <div class="progress"><span id="progress-bar"></span></div>
+            <button id="next" class="button">Sau →</button>
+        </div>
+        <div id="slide-counter" class="help">1 / 16</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const deck = document.getElementById('deck');
+            const slides = Array.from(deck.getElementsByClassName('slide'));
+            const prevBtn = document.getElementById('prev');
+            const nextBtn = document.getElementById('next');
+            const progressBar = document.getElementById('progress-bar');
+            const slideCounter = document.getElementById('slide-counter');
+            let current = 0;
+
+            function update() {
+                slides.forEach((slide, i) => {
+                    slide.classList.remove('active', 'prev');
+                    if (i === current) {
+                        slide.classList.add('active');
+                    } else if (i < current) {
+                        slide.classList.add('prev');
+                    }
+                });
+
+                prevBtn.disabled = current === 0;
+                nextBtn.disabled = current === slides.length - 1;
+
+                const progress = (current / (slides.length - 1)) * 100;
+                progressBar.style.width = `${progress}%`;
+                slideCounter.textContent = `${current + 1} / ${slides.length}`;
+            }
+
+            function goTo(index) {
+                if (index >= 0 && index < slides.length) {
+                    current = index;
+                    update();
+                }
+            }
+
+            prevBtn.addEventListener('click', () => goTo(current - 1));
+            nextBtn.addEventListener('click', () => goTo(current + 1));
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    goTo(current + 1);
+                }
+                if (e.key === 'ArrowLeft') goTo(current - 1);
+                if (e.key === 'Home') goTo(0);
+                if (e.key === 'End') goTo(slides.length - 1);
+            });
+
+            // Toggle content function for exercise slides
+            window.toggleContent = function(button, contentId) {
+                const content = document.getElementById(contentId);
+                const isShowing = content.classList.contains('show');
+
+                if (isShowing) {
+                    content.classList.remove('show');
+                    button.innerHTML = button.innerHTML.replace('🔽 Ẩn', '📝 Xem').replace('🔽 Ẩn', '🖥️');
+                } else {
+                    content.classList.add('show');
+                    if (button.innerHTML.includes('Code')) {
+                        button.innerHTML = '🔽 Ẩn Code';
+                    } else {
+                        button.innerHTML = '🔽 Ẩn Kết Quả';
+                    }
+                }
+            };
+
+            update();
+        });
+    </script>
+</body>
+
+</html>
